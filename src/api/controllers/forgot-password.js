@@ -18,7 +18,7 @@ export const forgotPassword = async (req, res) => {
         const { error } = validate.forgotPassword(req.body);
         if (error) throw new utils.ValidationError('Email not provided.');
     
-        // Destrucutre the request body
+        // Destructure the request body
         const { email } = req.body;
     
         // Request a password reset

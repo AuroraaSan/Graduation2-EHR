@@ -3,6 +3,7 @@ import * as utils from '../../utils/utils-index.js';
 import { Doctor, Patient, Contact, PatientContact } from '../../models/models-index.js';
 import * as validate from '../validators/user-validator.js';
 import { createMedicalRecord } from '../../interfaces/patient/create-medical-record.js';
+import Admin from '../../models/admin-model.js';
 import { redisClient } from '../../loaders/redis-loader.js';
 
 
@@ -16,8 +17,10 @@ export const register = async (req, res) => {
     if (req_user.role == "patient") {
       ({ error: user_error } = validate.patientRegister(req_user));
       ({ error: contact_error } = validate.emergencyContactInfo(req_contact));
-    } else if (req_user.role = "doctor") {
+    } else if (req_user.role == "doctor") {
         ({ error } = validate.doctorRegister(req_user)); 
+    } else if (req_user.role == "admin") {
+        ({ error } = validate.adminRegister(req_user));
     }
 
     if (error) throw new utils.ValidationError(error.details[0].message);
@@ -25,9 +28,20 @@ export const register = async (req, res) => {
     if (contact_error) throw new utils.ValidationError(contact_error.details[0].message);
 
     // Check if user already exists by email
-    const exists = req_user.role === 'doctor'
-      ? await Doctor.findOne({ where: { email: req_user.email } })
-      : await Patient.findOne({ where: { email: req_user.email } });
+    let exists;
+    switch (req_user.role) {
+      case 'doctor':
+        exists = await Doctor.findOne({ where: { email: req_user.email } });
+        break;
+      case 'patient':
+        exists = await Patient.findOne({ where: { email: req_user.email } });
+        break;
+      case 'admin':
+        exists = await Admin.findOne({ where: { email: req_user.email } });
+        break;
+      default:
+      throw new utils.ValidationError('Invalid user role');
+    }
     if (exists) throw new utils.ConflictError('User with this email already exists');
 
     // Create user in Auth0
@@ -40,7 +54,20 @@ export const register = async (req, res) => {
     console.log('Auth0 user created:', auth0User);
 
     // Assign role to the user
-    const roleId = req_user.role === 'doctor' ? 'rol_nbukgm8to015vJ7W' : 'rol_3YiZALY75IduFkBo';
+    let roleId;
+    switch (req_user.role) {
+      case 'doctor':
+        roleId = 'rol_nbukgm8to015vJ7W';
+        break;
+      case 'patient':
+        roleId = 'rol_3YiZALY75IduFkBo';
+        break;
+      case 'admin':
+        roleId = 'rol_DpBYYvubDf67wbsc';
+        break;
+      default:
+      throw new utils.ValidationError('Invalid user role');
+    }
     await utils.auth0Management.users.assignRoles({ id: auth0User.data.user_id }, { roles: [roleId] });
 
     // Create user in your database (without password)
@@ -63,10 +90,11 @@ export const register = async (req, res) => {
         phone_number: req_user.phone_number,
         educational_background: req_user.educational_background,
         hospital_affiliations: req_user.hospital_affiliations,
+        hospital_id: req_user.hospital_id,
       },
       { transaction }
     );
-    } else {
+    } else if (req_user.role === 'patient'){
       // Create patient user
       user = await Patient.create({
         id: auth0User.data.user_id,
@@ -105,18 +133,21 @@ export const register = async (req, res) => {
       },
       { transaction }
       );
+    } else if (req_user.role === 'admin') {
+      user = await Admin.create({
+        id: auth0User.data.user_id,
+        email: req_user.email,
+        full_name: req_user.full_name,
+        role: 'admin',
+        national_id: req_user.national_id,
+        phone_number: req_user.phone_number,
+        hospital_id: req_user.hospital_id,
+      },
+      { transaction }
+      );
     }
 
-
-    // Create record in patient service
     const recordCreationSuccessful = await createMedicalRecord({ patient_id: user.id, blood_type: "AB+", weight: 76, height: 176 });
-
-    // if (recordCreationSuccessful) {
-    //   console.log('Medical record created successfully');
-    // } else {
-    //   console.error('Error creating medical record');
-    //   throw new utils.InternalServerError('Error creating medical record');
-    // }
 
     await redisClient.hSet(`user:${user.id}`, {
       user: JSON.stringify(user),

@@ -48,7 +48,21 @@ export function doctorRegister(body) {
     phone_number: joi.string().phoneNumber({ defaultCountry: 'EG' }).required(),
     educational_background: joi.string().required(),
     hospital_affiliations: joi.string().required(),
+    hospital_id: joi.string().required(),
     role: joi.string().valid('doctor').required()
+  });
+  return schema.validate(body);
+}
+
+export function adminRegister(body) {
+  const schema = joi.object({
+    email: joi.string().email().min(3).required(),
+    full_name: joi.string().min(3).max(24).required(),
+    password: joi.string().min(6).max(20).required(),
+    national_id: joi.string().length(14).required(),
+    phone_number: joi.string().phoneNumber({ defaultCountry: 'EG' }),
+    hospital_id: joi.string().required(),
+    role: joi.string().valid('admin').required()
   });
   return schema.validate(body);
 }
@@ -140,6 +154,15 @@ export function editDoctor(body) {
     years_of_experience: joi.string(),
     phone_number: joi.string().phoneNumber({ defaultCountry: 'EG' }),
     hospital_affiliations: joi.string()
+  });
+  return schema.validate(body);
+}
+
+export function createAdmission(body) {
+  const schema = joi.object({
+    patient_id: joi.string().required(),
+    doctor_id: joi.string().required(),
+    discharge_date: joi.date(),
   });
   return schema.validate(body);
 }

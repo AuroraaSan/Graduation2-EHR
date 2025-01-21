@@ -1,0 +1,1 @@
+export { default as createHospital } from './hospital/create-hospital.js'
