@@ -9,6 +9,7 @@ import { createHospital } from '../controllers/hospital-controller.js';
 
 import { authAccessToken } from '../middleware/auth-middleware.js';
 import { getUser } from '../controllers/patient-controller-index.js';
+import { authenticate } from 'passport';
 const router = Router();
 
 
@@ -27,6 +28,10 @@ router.use('/doctor', doctorRouter);
 
 // Admin Routes
 router.use('/admin', adminRouter);
+
+router.get('/auth', authAccessToken, (req, res) => {
+    res.send({authenticated: true});
+});
 
 router.get('/profile', authAccessToken, (req, res) => {
     console.log(req);
