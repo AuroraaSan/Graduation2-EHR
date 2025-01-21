@@ -1,4 +1,4 @@
-name: User service pipeline
+name: User Service Pipeline
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
 
 env:
   DOCKER_IMAGE_NAME: joebeanzz123/user_service
-  IMAGE_TAG: latest
 
 jobs:
   build-and-deploy:
@@ -18,31 +17,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Lgin to Docker Hub
-      - name: Log in to Docker Hub
+      # Login to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build and push the Docker image
+      # Build and push Docker image
       - name: Build and push Docker image
         run: |
+          IMAGE_TAG=${{ github.sha }}
           docker build -t $DOCKER_IMAGE_NAME:$IMAGE_TAG .
           docker push $DOCKER_IMAGE_NAME:$IMAGE_TAG
-
-      # Run the Docker container with runtime secrets
-      # - name: Run Docker container with secrets
-      #   run: |
-      #     docker run -d \
-      #       -e DB_URI="${{ secrets.DB_URI }}" \
-      #       -e JWT_ACCESS_SECRET_KEY="${{ secrets.JWT_ACCESS_SECRET_KEY }}" \
-      #       -e JWT_REFRESH_SECRET_KEY="${{ secrets.JWT_REFRESH_SECRET_KEY }}" \
-      #       -e JWT_RESET_SECRET_KEY="${{ secrets.JWT_RESET_SECRET_KEY }}" \
-      #       -e APP_MAIL="${{ secrets.APP_MAIL }}" \
-      #       -e APP_MAIL_KEY="${{ secrets.APP_MAIL_KEY }}" \
-      #       -e REDIS_HOST="redis-14068.c239.us-east-1-2.ec2.redns.redis-cloud.com" \
-      #       -e REDIS_PORT=14068 \
-      #       -e REDIS_PASS='OS29hReaPP6e75raJEoh7qAsX8MNt5gM' \
-      #       -p 3000:3000 \
-      #       $DOCKER_IMAGE_NAME:$IMAGE_TAG
+          # Also push the same image as 'latest'
+          docker tag $DOCKER_IMAGE_NAME:$IMAGE_TAG $DOCKER_IMAGE_NAME:latest
+          docker push $DOCKER_IMAGE_NAME:latest
