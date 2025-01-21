@@ -6,12 +6,10 @@ import patientRouter from './patient-route.js';
 import doctorRouter from './doctor-route.js';
 import adminRouter from './admin-route.js';
 import { createHospital } from '../controllers/hospital-controller.js';
-
 import { authAccessToken } from '../middleware/auth-middleware.js';
 import { getUser } from '../controllers/patient-controller-index.js';
-import { authenticate } from 'passport';
-const router = Router();
 
+const router = Router();
 
 const specDoc = swaggerJsdoc(swaggerConfig);
 
