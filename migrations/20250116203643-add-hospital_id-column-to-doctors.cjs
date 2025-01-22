@@ -4,7 +4,7 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.addColumn('doctors', 'hospital_id', {
-      type: Sequelize.STRING,
+      type: Sequelize.UUID,
       allowNull: false,
       references: {
         model: 'hospitals',

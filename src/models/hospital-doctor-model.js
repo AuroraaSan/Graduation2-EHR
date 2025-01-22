@@ -5,7 +5,7 @@ const HospitalDoctor = sequelize.define(
     'hospital_doctors',
     {
         hospital_id: {
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
         references: {
             model: 'hospitals',
             key: 'id',

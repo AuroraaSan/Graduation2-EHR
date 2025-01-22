@@ -68,6 +68,15 @@ Doctor.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    hospital_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'hospitals',
+        key: 'id',
+      },
+      onDelete: 'CASCADE',
+    }
   },
   {
     sequelize,

@@ -41,7 +41,7 @@ Admission.init(
             primaryKey: true,
         },
         hospital_id: {
-            type: DataTypes.STRING,
+            type: DataTypes.UUID,
             allowNull: false,
             references: {
                 model: 'hospitals',

@@ -40,7 +40,7 @@ module.exports = {
         primaryKey: true,
     },
     hospital_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
         allowNull: false,
         references: {
             model: 'hospitals',
