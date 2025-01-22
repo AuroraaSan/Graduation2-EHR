@@ -85,6 +85,15 @@ export function doctorLogin(body) {
   return schema.validate(body);
 }
 
+export function adminLogin(body) {
+  const schema = joi.object({
+    email: joi.string().email().min(3).required(),
+    password: joi.string().min(6).max(20).required(),
+    role: joi.string().valid('admin').required()
+  });
+  return schema.validate(body);
+}
+
 export function sendVerificationCode(body) {
   const schema = joi.object({
     email: joi.string().email().min(3).required()

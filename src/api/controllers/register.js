@@ -6,8 +6,8 @@ import { createMedicalRecord } from '../../interfaces/patient/create-medical-rec
 import Admin from '../../models/admin-model.js';
 import { redisClient } from '../../loaders/redis-loader.js';
 
-
 export const register = async (req, res) => {
+  let transaction;
   try {
     const transaction = await sequelize.transaction();
     // Validate user input
@@ -51,8 +51,6 @@ export const register = async (req, res) => {
       connection: 'Username-Password-Authentication',
     });
 
-    console.log('Auth0 user created:', auth0User);
-
     // Assign role to the user
     let roleId;
     switch (req_user.role) {
@@ -72,6 +70,7 @@ export const register = async (req, res) => {
 
     // Create user in your database (without password)
     let user;
+
     if (req_user.role === 'doctor') {
       user = await Doctor.create({
         id: auth0User.data.user_id,
@@ -147,12 +146,12 @@ export const register = async (req, res) => {
       );
     }
 
-    const recordCreationSuccessful = await createMedicalRecord({ patient_id: user.id, blood_type: "AB+", weight: 76, height: 176 });
+    // const recordCreationSuccessful = await createMedicalRecord({ patient_id: user.id, blood_type: "AB+", weight: 76, height: 176 });
 
-    await redisClient.hSet(`user:${user.id}`, {
-      user: JSON.stringify(user),
-      id_token: auth0Response.id_token,
-    });
+    // await redisClient.hSet(`user:${user.id}`, {
+    //   user: JSON.stringify(user),
+    //   id_token: auth0Response.id_token,
+    // });
 
     // Commit the transaction
     await transaction.commit();

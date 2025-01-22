@@ -1,8 +1,7 @@
 import * as validate from '../../validators/user-validator.js';
 import * as utils from '../../../utils/utils-index.js';
-import Patient from '../../../models/patient-model.js';
-import Doctor from '../../../models/doctor-model.js';
-import Admin from '../../../models/admin-model.js';
+import { Patient, Doctor, Admin, Admission} from '../../../models/models-index.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export default async (req, res) => {
     try {
@@ -39,6 +38,7 @@ export default async (req, res) => {
         if (oldAdmission) throw new utils.ConflictError('Patient is already admitted');
 
         const admission = await Admission.create({
+            id: uuidv4(),
             patient_id,
             doctor_id,
             admin_id: adminId,

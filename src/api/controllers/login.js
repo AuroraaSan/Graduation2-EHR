@@ -1,4 +1,4 @@
-import { Patient, Doctor, Token } from '../../models/models-index.js';
+import { Patient, Doctor, Admin } from '../../models/models-index.js';
 import * as validate from '../validators/user-validator.js';
 import * as utils from '../../utils/utils-index.js'
 import { redisClient } from '../../loaders/redis-loader.js';
@@ -8,7 +8,6 @@ import { auth0_audience } from '../../config/config.js';
 export const login = async (req, res) => {
   let transaction;
   try {
-
     transaction = await sequelize.transaction(); // Start a new transaction
     // Validate login data
     const { error } = validate[`${req.body.role}Login`](req.body);
@@ -27,12 +26,21 @@ export const login = async (req, res) => {
       connection: 'Username-Password-Authentication', // Add this line
     });
 
-    // console.log('Auth0 response:', auth0Response);
-    
     // Find user in the database
-    const {dataValues: user} = role === 'doctor'
-      ? await Doctor.findOne({ where: { email } })
-      : await Patient.findOne({ where: { email } });
+    let user;
+    switch (role) {
+      case 'doctor':
+        user = await Doctor.findOne({ where: { email } });
+        break;
+      case 'patient':
+        user = await Patient.findOne({ where: { email } });
+        break;
+      case 'admin':
+        user = await Admin.findOne({ where: { email } });
+        break;
+      default:
+      throw new utils.ValidationError('Invalid role');
+    }
     if (!user) {
       throw new utils.NotFoundError('User not found or not verified');
     }

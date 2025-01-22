@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { authAccessToken } from "../middleware/auth-middleware.js";
-import { createAdmission, getAdmissions, getHospitalDoctors, register } from "../controllers/admin-controller.js";
-
+import { login, createAdmission, getHospitalAdmissions, getHospitalDoctors, register } from "../controllers/admin-controller.js";
 
 const router = Router();
 
@@ -9,9 +8,15 @@ router.post('/register', (req, res) => {
     req.body.user.role = 'admin';
     register(req, res);
 });
-router.get('/admissions', authAccessToken, getAdmissions); // get all hospital ongoing admissions paginated
+
+router.post('/login', (req, res) => {
+    req.body.role = 'admin';
+    login(req, res);
+});  
+
+router.get('/admissions', authAccessToken, getHospitalAdmissions);
 router.post('/admission', authAccessToken, createAdmission);
-router.get('/hospital/:id/doctors', authAccessToken, getHospitalDoctors); // paginated
+router.get('/doctors', authAccessToken, getHospitalDoctors); // paginated
 // router.get('hospital/:id/patients', authAccessToken, getHospitalPatients);
 // discharge endpoint
 
