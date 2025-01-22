@@ -5,10 +5,16 @@ from typing import List, Dict
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+from fastapi.middleware.cors import CORSMiddleware
+from pymongo import MongoClient
+from datetime import datetime
+import uuid
 
 # Load environment variables
 load_dotenv()
 nebius_api_key = os.getenv("NEBIUS_API_KEY")
+mongo_uri = os.getenv("MONGO_URI")  # Add MongoDB connection URI in .env
+
 
 # Initialize OpenAI client
 client = OpenAI(
@@ -16,8 +22,24 @@ client = OpenAI(
     api_key=nebius_api_key,
 )
 
+# Initialize MongoDB client
+client_mongo = MongoClient(mongo_uri)
+db = client_mongo["Patient_Service"]
+chatbot_history = db["chatbot_history"]
+
+
 # Initialize FastAPI app
 app = FastAPI()
+
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:3002"],  # Allow specific origin
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 
 # Define Pydantic models for input validation
@@ -30,7 +52,6 @@ class MedicalSummaryRequest(BaseModel):
     medical_history: str
 
 
-# Define Pydantic models for input validation
 class Visit(BaseModel):
     purpose: str
     date: str
@@ -134,51 +155,197 @@ class PatientData(BaseModel):
     updatedAt: str  # Chatbot conversation function
 
 
-def chatbot_conversation(conversation_history, user_input):
-    try:
-        # Append user input to conversation history
-        conversation_history.append({"role": "user", "content": user_input})
+# Pydantic models for validation
+class InitiateChatRequest(BaseModel):
+    doctor_id: str
+    user_input: str
 
-        # Call the AI model for a response
+
+class ContinueChatRequest(BaseModel):
+    conversation_id: str
+    user_input: str
+
+
+# Helper function to interact with OpenAI API
+def get_chatbot_response(conversation_history):
+    try:
         response = client.chat.completions.create(
             model="aaditya/Llama3-OpenBioLLM-70B", messages=conversation_history
         )
-
-        # Extract the AI's reply
-        bot_reply = response.choices[0].message.content
-
-        # Add the AI's reply to the conversation history
-        conversation_history.append({"role": "assistant", "content": bot_reply})
-
-        return bot_reply, conversation_history
+        return response.choices[0].message.content
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error interacting with AI: {str(e)}"
+        )
 
 
-# Endpoint for chatbot interaction
-@app.post("/chat/")
-async def chat_with_bot(chat_message: ChatMessage):
+# ---------------------------------------------------
+
+
+# API to start a new conversation
+@app.post("/chat/initiate/")
+async def initiate_chat(request: InitiateChatRequest):
     """
-    API endpoint for interacting with the chatbot.
+    Start a new chat session.
     """
-    bot_reply, updated_history = chatbot_conversation(
-        chat_message.conversation_history, chat_message.user_input
+    conversation_id = str(uuid.uuid4())  # Generate a unique conversation ID
+
+    # System role
+    system_role = {
+        "role": "system",
+        "content": "You are a helpful medical assistant specializing in healthcare-related queries.",
+    }
+
+    # Initial conversation
+    conversation_history = [
+        system_role,
+        {"role": "user", "content": request.user_input},
+    ]
+    bot_reply = get_chatbot_response(conversation_history)
+
+    # Save the new conversation to the database
+    chatbot_history.insert_one(
+        {
+            "conversation_id": conversation_id,
+            "doctor_id": request.doctor_id,
+            "system_role": system_role["content"],
+            "conversation": [
+                {"role": "user", "content": request.user_input},
+                {"role": "assistant", "content": bot_reply},
+            ],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
     )
-    return {"bot_reply": bot_reply, "conversation_history": updated_history}
+
+    return {"conversation_id": conversation_id, "bot_reply": bot_reply}
 
 
+# API to continue an existing conversation
+@app.post("/chat/continue/")
+async def continue_chat(request: ContinueChatRequest):
+    """
+    Continue a conversation using the conversation_id.
+    """
+    # Fetch the conversation from the database
+    conversation = chatbot_history.find_one(
+        {"conversation_id": request.conversation_id}
+    )
+
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    # Add the new user input
+    conversation_history = conversation["conversation"]
+    conversation_history.append({"role": "user", "content": request.user_input})
+
+    # Get the bot's reply
+    bot_reply = get_chatbot_response(
+        [{"role": "system", "content": conversation["system_role"]}]
+        + conversation_history
+    )
+
+    # Update the conversation in the database
+    conversation_history.append({"role": "assistant", "content": bot_reply})
+    chatbot_history.update_one(
+        {"conversation_id": request.conversation_id},
+        {
+            "$set": {
+                "conversation": conversation_history,
+                "updated_at": datetime.utcnow(),
+            }
+        },
+    )
+
+    return {"bot_reply": bot_reply}
+
+
+# ---------------------------------------------------
+
+
+# API to get all the conversations for a specific doctor
+@app.get("/chats/")
+async def get_all_conversations(doctor_id: str):
+    """
+    Retrieve all conversations for a specific doctor.
+    Each conversation includes its ID and a name (first 30 characters of the latest question).
+    """
+    try:
+        # Find all conversations for the doctor
+        conversations = chatbot_history.find({"doctor_id": doctor_id}).sort(
+            "updated_at", -1
+        )
+
+        # Create a list with ID and a name (latest user question)
+        results = []
+        for convo in conversations:
+            # Get the latest user question
+            latest_user_question = next(
+                (
+                    msg["content"]
+                    for msg in reversed(convo["conversation"])
+                    if msg["role"] == "user"
+                ),
+                "No user questions",
+            )
+            # Add conversation name and ID to results
+            results.append(
+                {
+                    "conversation_id": convo["conversation_id"],
+                    "name": latest_user_question[:30],  # Truncate to 30 characters
+                }
+            )
+
+        return {"conversations": results}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error retrieving conversations: {str(e)}"
+        )
+
+
+# API to get the full history of a specific conversation
+@app.get("/chat/{conversation_id}")
+async def get_conversation_history(conversation_id: str):
+    """
+    Retrieve the full history of a specific conversation by its ID.
+    """
+    try:
+        # Fetch the conversation by its ID
+        conversation = chatbot_history.find_one({"conversation_id": conversation_id})
+
+        if not conversation:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+
+        return {
+            "conversation_id": conversation["conversation_id"],
+            "doctor_id": conversation["doctor_id"],
+            "conversation": conversation["conversation"],
+            "system_role": conversation["system_role"],
+            "created_at": conversation["created_at"],
+            "updated_at": conversation["updated_at"],
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error retrieving conversation history: {str(e)}"
+        )
+
+
+# --------------------------------------------------
+
+
+# function to create a medical summary using the AI model
 def create_medical_summary(medical_history: str):
     try:
         # Debug log for the request payload
         # print(f"Sending to AI Model: {medical_history}")
-
+        print(medical_history)
         # Call the AI model for summarizing medical history
         response = client.chat.completions.create(
             model="aaditya/Llama3-OpenBioLLM-70B",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an advanced medical AI assistant trained in biomedical and clinical data summarization. Your task is to generate concise, accurate, and clinically relevant summaries of patient medical histories. These summaries should assist healthcare providers in making informed decisions by highlighting key medical conditions, allergies, medications, surgeries, and any significant trends or patterns in the patient’s health.",
+                    "content": "You are an expert and experienced from the healthcare and biomedical domain with extensive medical knowledge and practical experience. Your name is Hamo, an Egyptian chatbot that helps doctors and patients, who is willing to help answer the user's query with explanation. Please summarize the key points from the following clinical note, focusing on the patient's chief complaint, relevant medical history, physical examination findings, diagnosis, and treatment plan:, keep it short and concise.",
                 },
                 {
                     "role": "user",
@@ -193,6 +360,7 @@ def create_medical_summary(medical_history: str):
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 
+# API endpoint for creating a summary of a medical history
 @app.post("/create_summary/")
 async def summarize_medical_history(patient_data: PatientData):
     """
@@ -208,6 +376,7 @@ async def summarize_medical_history(patient_data: PatientData):
     return {"medical_history": medical_history_summary}
 
 
+# Helper function to process patient data
 def process_patient_data(data):
     # Medical Conditions
     conditions_str = (
@@ -270,6 +439,7 @@ def process_patient_data(data):
 
     # General Patient Information
     medical_history = (
+        f"This is a summary of the medical history for patient Ahmed Hagag. "
         f"Patient ID: {data.get('patient_id', 'Unknown ID')}. "
         f"Blood Type: {data.get('blood_type', 'Unknown Blood Type')}. "
         f"Weight: {data.get('weight', 'Unknown Weight')}kg. Height: {data.get('height', 'Unknown Height')}cm. "
