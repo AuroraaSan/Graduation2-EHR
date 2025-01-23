@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.responses import JSONResponse
 from typing import List, Optional, Dict
 from pydantic import BaseModel, Field
 from typing import List, Dict
@@ -14,6 +15,9 @@ import uuid
 load_dotenv()
 nebius_api_key = os.getenv("NEBIUS_API_KEY")
 mongo_uri = os.getenv("MONGO_URI")  # Add MongoDB connection URI in .env
+
+# Specify the local path to the downloaded model
+local_model_path = "/code/model"
 
 
 # Initialize OpenAI client
@@ -453,3 +457,51 @@ def process_patient_data(data):
     )
 
     return medical_history
+
+
+# ---------------------------------------------------
+
+
+from transformers import pipeline
+import shutil
+
+# Initialize the classifier using the local model path
+classifier = pipeline(task="image-classification", model=local_model_path)
+
+
+# Endpoint to classify an X-ray image
+@app.post("/classify-xray/")
+async def classify_xray(file: UploadFile = File(...)):
+    """
+    Endpoint to classify an X-ray image as 'Pneumonia' or 'Normal'.
+    """
+    try:
+        # Save the uploaded file to a temporary directory
+        temp_file_path = f"temp_{file.filename}"
+        with open(temp_file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        # Use the classifier pipeline to classify the X-ray image
+        result = classifier(temp_file_path)
+
+        # Clean up the temporary file
+        os.remove(temp_file_path)
+
+        # Extract and return the classification result
+        if result and len(result) > 0:
+            return JSONResponse(
+                content={
+                    "classification": result[0]["label"],
+                    "score": result[0]["score"],
+                }
+            )
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Classification failed: No result returned from the model.",
+            )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error processing the X-ray image: {str(e)}"
+        )
