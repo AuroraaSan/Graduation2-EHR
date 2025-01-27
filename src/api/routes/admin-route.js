@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authAccessToken } from "../middleware/auth-middleware.js";
-import { login, createAdmission, getHospitalAdmissions, getHospitalDoctors, register } from "../controllers/admin-controller.js";
+import { login, createAdmission, getHospitalAdmissions, getHospitalDoctors, register, getHospitalPatients, dischargePatient, getDoctorPatients } from "../controllers/admin-controller.js";
 
 const router = Router();
 
@@ -16,11 +16,11 @@ router.post('/login', (req, res) => {
 
 router.get('/admissions', authAccessToken, getHospitalAdmissions);
 router.post('/admission', authAccessToken, createAdmission);
-router.get('/doctors', authAccessToken, getHospitalDoctors); // paginated
-// router.get('hospital/:id/patients', authAccessToken, getHospitalPatients);
-// discharge endpoint
+router.get('/doctors', authAccessToken, getHospitalDoctors);
+router.get('/patients', authAccessToken, getHospitalPatients);
+router.patch('/patient/:id/discharge', authAccessToken, dischargePatient);
+router.get('/doctor/:id/patients', authAccessToken, getDoctorPatients);
 
-// list patients assigned to doctor
 // list of all visits of a patient related to this doctor
 
 export default router;

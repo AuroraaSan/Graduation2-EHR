@@ -1,5 +1,8 @@
 export { default as createAdmission } from './admin/create-admission.js'
 export { default as getHospitalAdmissions } from './admin/get-hospital-admissions.js'
 export { default as getHospitalDoctors } from './admin/get-hospital-doctors.js'
+export { default as getHospitalPatients } from './admin/get-hospital-patients.js'
+export { default as dischargePatient } from './admin/discharge-patient.js'
+export { default as getDoctorPatients } from './admin/get-doctor-patients.js'
 export { register } from './register.js'
 export { login } from './login.js'
