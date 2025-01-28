@@ -18,7 +18,7 @@ const AdmittedDoctors: React.FC = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axios.get('https://6cfa-41-33-62-118.ngrok-free.app/api/user/admin/doctors', {withCredentials: true});
+        const response = await axios.get('http://localhost:3000/api/user/admin/doctors', {withCredentials: true});
         setDoctors(response.data);
       } catch (err) {
         setError('Failed to load Doctors');
@@ -30,9 +30,9 @@ const AdmittedDoctors: React.FC = () => {
     fetchDoctors();
   }, []);
 
-  const filteredDoctors = Doctors.filter(Doctor =>
+  /*const filteredDoctors = Doctors.filter(Doctor =>
     Doctor.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  );*/
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -44,9 +44,7 @@ const AdmittedDoctors: React.FC = () => {
         <h2 className="text-3xl text-blue-600 mb-6">Admitted Doctors</h2>
         <div className="bg-white shadow-md rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
-            <span className="text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
-              {filteredDoctors.length} Doctors
-            </span>
+
             <input
               type="text"
               placeholder="Search by name"
@@ -64,16 +62,6 @@ const AdmittedDoctors: React.FC = () => {
                 <th className="border-b py-2">Doctor Name</th>
               </tr>
             </thead>
-            <tbody>
-              {filteredDoctors.map((Doctor) => (
-                <tr key={Doctor.id}>
-                  <td className="border-b py-2">{Doctor.id}</td>
-                  <td className="border-b py-2">{Doctor.full_name}</td>
-                  <td className="border-b py-2">{Doctor.specialization}</td>
-                  <td className="border-b py-2">{Doctor.email}</td>
-                </tr>
-              ))}
-            </tbody>
           </table>
         </div>
       </div>
