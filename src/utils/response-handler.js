@@ -3,7 +3,7 @@ import { BaseError } from './utils-index.js';
 const sendSuccess = (res, message = 'Success', data = {}, statusCode = 200) => {
   res.status(statusCode).json({
     status: 'success',
-    message,
+    message,  
     data,
   });
 };

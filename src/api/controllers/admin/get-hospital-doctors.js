@@ -11,6 +11,8 @@ export default async (req, res) => {
 
         const { page = 1, limit = 10 } = req.query;
 
+        console.log("Admin ID: ", adminId);
+        console.log("Admin: ", admin);
         const doctors = await Doctor.findAll({
             where: {
             hospital_id: admin.hospital_id

@@ -35,6 +35,7 @@ export default (app) => {
   app.use(cors({
     origin: ['http://localhost:3002', 'http://127.0.0.1:3002'],
     credentials: true,
+    accessControlAllowOrigin: ['http://localhost:3002', 'http://127.0.0.1:3002'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   }));
