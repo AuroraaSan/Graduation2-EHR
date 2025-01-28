@@ -5,15 +5,13 @@ import * as utils from '../../utils/utils-index.js';
  * @param {string} requiredRole - The role required to access the resource.
  */
 // eslint-disable-next-line consistent-return
-export const authorizeUser = (requiredRole) => (req, res, next) => {
+export const authorizeUser = requiredRole => (req, res, next) => {
   try {
     // Extract the user's role from the token payload
-    console.log(req.auth.payload);
-    const { role } = req.auth.payload;
-    console.log(role);
+    const { permissions } = req.auth.payload;
 
     // Check if the user has the required role
-    if (role !== requiredRole) {
+    if (!permissions.includes(requiredRole)) {
       throw new utils.ForbiddenError('Forbidden: Insufficient permissions');
     }
 
