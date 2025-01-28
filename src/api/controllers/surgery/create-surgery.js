@@ -1,15 +1,15 @@
 import { Surgery, MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, asyncHandler, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import { NotFoundError, ValidationError } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { createSurgerySchema } from '../../validators/schemas/index.js';
 
-export default [
-  validate(createSurgerySchema),
-  asyncHandler(async (req, res) => {
+const createSurgery = async (req, res) => {
+  try {
+    validate(createSurgerySchema);
     const {
-      medical_record_id,
+      patient_id,
       type,
       procedure_date,
       hospital,
@@ -24,23 +24,24 @@ export default [
       images,
     } = req.body;
 
-    const doctor_id = req.body?.doctor_id;
+    const doctor_id = req.auth.payload.sub;
     if (!doctor_id) {
       throw new ValidationError('Doctor ID not provided', { field: 'doctor_id' });
     }
 
     // Verify medical record exists
-    const medicalRecord = await MedicalRecord.findById(medical_record_id);
+    const medicalRecord = await MedicalRecord.findOne({ patient_id });
     if (!medicalRecord) {
-      throw new NotFoundError('Medical Record', medical_record_id);
+      throw new NotFoundError('Medical Record', patient_id);
     }
 
     const surgery = new Surgery({
-      medical_record_id,
+      medical_record_id: medicalRecord._id,
+      patient_id,
       type,
       procedure_date,
       hospital,
-      primary_surgeon_id: doctor_id,
+      surgeon_id: doctor_id,
       assistant_surgeon_ids,
       anesthesiologist_id,
       pre_op_diagnosis,
@@ -57,12 +58,12 @@ export default [
 
     // Update medical record with the new surgery
     await MedicalRecord.findByIdAndUpdate(
-      medical_record_id,
+      medicalRecord._id,
       { $push: { surgeries: savedSurgery._id } }
     );
 
     await createAuditLog({
-      medical_record_id,
+      medical_record_id: medicalRecord._id,
       collection_name: 'surgeries',
       document_id: savedSurgery._id,
       action: 'CREATE',
@@ -76,5 +77,9 @@ export default [
     });
 
     return sendSuccess(res, savedSurgery, 'Surgery scheduled successfully', 201);
-  }),
-];
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
+export default asyncHandler(createSurgery);

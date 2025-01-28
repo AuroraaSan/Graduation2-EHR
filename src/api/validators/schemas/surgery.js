@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export const createSurgerySchema = {
   body: {
-    medical_record_id: Joi.string().required(),
+    patient_id: Joi.string().required(),
     type: Joi.string().required(),
     procedure_date: Joi.date().iso().required(),
     hospital: Joi.string().required(),

@@ -87,13 +87,15 @@ router.get(
   getAllVisits
 );
 
-router.put('/visits/:id',
+router.put(
+  '/visits/:id',
   authenticate,
   authorizeUser('updateVisit'),
-  updateVisit,
+  updateVisit
 );
 
-router.delete('/visits/:id', 
+router.delete(
+  '/visits/:id',
   authenticate,
   authorizeUser('deleteVisit'),
   deleteVisit
@@ -102,7 +104,8 @@ router.delete('/visits/:id',
 // ---------------------- Surgery routes ---------------------- //
 router.post(
   '/surgeries',
-  // authorize(RecordAuthorization.createSurgery),
+  authenticate,
+  authorizeUser('createSurgery'),
   createSurgery
 );
 
