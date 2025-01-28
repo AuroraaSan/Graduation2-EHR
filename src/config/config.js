@@ -4,7 +4,7 @@ import { config } from 'dotenv';
 config();
 
 const {
-  DB_URI, PORT, JWT_SECRET_KEY,
+  DB_URI, PORT, JWT_SECRET_KEY, MONGO_URI,
   REFRESH_TOKEN_SECRET_KEY,
   AUTH0_DOMAIN,
   AUTH0_DOMAIN2,
@@ -21,6 +21,7 @@ export const port = PORT || 3001;
 export const jwtSecretKey = JWT_SECRET_KEY;
 export const refreshTokenSecretKey = REFRESH_TOKEN_SECRET_KEY;
 export const dbUri = DB_URI;
+export const mongoUri = MONGO_URI;
 // export const awsAccessKey = AWS_ACCESS_KEY_ID;
 // export const awsSecretAccessKey = AWS_SECRET_ACCESS_KEY;
 // export const awsRegion = AWS_REGION;

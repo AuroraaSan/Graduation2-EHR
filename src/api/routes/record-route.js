@@ -136,9 +136,9 @@ router.get(
   '/check-authentication',
   authAccessToken,
   (req, res) => {
-    res.send({"authenticated": true});
+    res.send({ authenticated: true });
   }
-)
+);
 
 // router.get('/conditions', getAllConditions);
 // router.get('/conditions/:id', getCondition);
