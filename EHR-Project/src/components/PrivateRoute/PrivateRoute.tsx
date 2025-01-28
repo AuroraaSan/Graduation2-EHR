@@ -19,7 +19,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles, element }) =>
 
   // Redirect to login if not authenticated
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/DoctorsAdmitted" replace />;
   }
 
   // Redirect to unauthorized if user role is not allowed

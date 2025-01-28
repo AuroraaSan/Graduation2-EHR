@@ -14,6 +14,7 @@ interface LoginFormInputs {
 const API_ENDPOINTS = {
   LOGIN_Doc: "/api/user/doctor/login",
   LOGIN_Patient: "/api/user/patient/login",
+  LOGIN_Admin: "/api/user/admin/login",
 };
 
 const validationSchema = Yup.object().shape({
@@ -51,7 +52,14 @@ function LoginForm() {
           toast.success("Login successful!");
           navigate("/PatientDashboard");
         }
-      } else {
+      }else if (role === "admin") {
+        response = await api.post(API_ENDPOINTS.LOGIN_Admin, values);
+  
+        if (response.status === 200 && response.data.data) {
+          toast.success("Login successful!");
+          navigate("/AdminDashboard");
+        }
+      }else {
         throw new Error("Invalid role selected.");
       }
 
@@ -129,6 +137,7 @@ function LoginForm() {
                     >
                       <option value="doctor">Doctor</option>
                       <option value="patient">Patient</option>
+                      <option value="admin">Admin</option>
                     </select>
                   </div>
 
