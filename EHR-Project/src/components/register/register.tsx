@@ -81,7 +81,7 @@ const Register = () => {
       hospitalAffiliations: formElements.hospitalAffiliations.value,
     };
     try {
-      const response = await api.post("/doctor/register", doctorData);
+      const response = await api.post("/user/doctor/register", doctorData);
 
       if (response.status === 200 && response.data.data) {
         toast.success("Doctor registered successfully!");
