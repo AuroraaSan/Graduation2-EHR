@@ -14,35 +14,12 @@ router.post('/login', (req, res) => {
     login(req, res);
 });  
 
-router.get('/admissions', 
-    // authAccessToken, 
-    getHospitalAdmissions
-); // doctor name 
-
-router.post('/admission', 
-    // authAccessToken, 
-    createAdmission
-);
-
-router.get('/doctors', 
-    // authAccessToken, 
-    getHospitalDoctors
-);
-
-router.get('/patients', 
-    // authAccessToken, 
-    getHospitalPatients
-);
-
-router.patch('/patient/:id/discharge', 
-    // authAccessToken, 
-    dischargePatient
-);
-
-router.get('/doctor/:id/patients', 
-    // authAccessToken, 
-    getDoctorPatients
-);
+router.get('/admissions', authAccessToken, getHospitalAdmissions);
+router.post('/admission', authAccessToken, createAdmission);
+router.get('/doctors', authAccessToken, getHospitalDoctors);
+router.get('/patients', authAccessToken, getHospitalPatients);
+router.patch('/patient/:id/discharge', authAccessToken, dischargePatient);
+router.get('/doctor/:id/patients', authAccessToken, getDoctorPatients);
 
 // list of all visits of a patient related to this doctor
 
