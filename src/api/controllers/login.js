@@ -41,6 +41,8 @@ export const login = async (req, res) => {
       default:
       throw new utils.ValidationError('Invalid role');
     }
+    const userData = user.dataValues;
+
     if (!user) {
       throw new utils.NotFoundError('User not found or not verified');
     }
@@ -64,12 +66,14 @@ export const login = async (req, res) => {
     await transaction.commit();
 
     // Cache user info and refresh token in Redis
-    await redisClient.hSet(`user:${user.id}`, {
-      user: JSON.stringify({ ...user, role }),
+    console.log("user:", userData);
+    await redisClient.hSet(`user:${userData.id}`, {
+      user: JSON.stringify({ ...userData, role }),
       id_token: auth0Response.id_token,
+      login_ip: userIp,
     });
 
-    await redisClient.expire(`user:${user.id}`, 2592000); // 30 days
+    await redisClient.expire(`user:${userData.id}`, 2592000); // 30 days
 
     res.cookie("accessToken", auth0Response.access_token, {
       httpOnly: true,     // Prevent access to the cookie from JavaScript
@@ -89,7 +93,7 @@ export const login = async (req, res) => {
 
     // Send successful response
     return utils.sendSuccess(res, 'Login successful', {
-      user: { role, ...user },
+      user: { role, ...userData },
       idToken: auth0Response.id_token,
       accessToken: auth0Response.access_token,
     });

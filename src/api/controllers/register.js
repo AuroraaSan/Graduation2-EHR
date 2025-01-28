@@ -14,6 +14,7 @@ export const register = async (req, res) => {
     let error, user_error, contact_error;
     const { user: req_user, contact: req_contact } = req.body;
 
+    // console.log(req_user);
     if (req_user.role == "patient") {
       ({ error: user_error } = validate.patientRegister(req_user));
       ({ error: contact_error } = validate.emergencyContactInfo(req_contact));
@@ -52,6 +53,7 @@ export const register = async (req, res) => {
     });
 
     // Assign role to the user
+    
     let roleId;
     switch (req_user.role) {
       case 'doctor':
@@ -146,12 +148,16 @@ export const register = async (req, res) => {
       );
     }
 
-    // const recordCreationSuccessful = await createMedicalRecord({ patient_id: user.id, blood_type: "AB+", weight: 76, height: 176 });
+    const recordCreationSuccessful = await createMedicalRecord({ patient_id: user.id, blood_type: "AB+", weight: 76, height: 176 });
 
-    // await redisClient.hSet(`user:${user.id}`, {
-    //   user: JSON.stringify(user),
-    //   id_token: auth0Response.id_token,
-    // });
+    if (!recordCreationSuccessful) {
+      console.log('Error creating medical record');
+    }
+
+    await redisClient.hSet(`user:${user.id}`, {
+      user: JSON.stringify(user),
+      // id_token: auth0Response.id_token,
+    });
 
     // Commit the transaction
     await transaction.commit();
@@ -164,11 +170,12 @@ export const register = async (req, res) => {
     console.error('Error in register controller:', error);
     // Rollback the transaction
     await transaction.rollback();
-    
+
+    await utils.auth0Management.users.delete({ id: auth0User.data.user_id });
     // Delete user from Auth0 if user creation fails
-    if (error.name === 'Auth0Error' && auth0User?.data?.user_id) {
-      await utils.auth0Management.users.delete({ id: auth0User.data.user_id });
-    }
+    // if (error.name === 'Auth0Error' && auth0User?.data?.user_id) {
+      
+    // }
     return utils.sendError(res, error);
   }
 };

@@ -32,7 +32,7 @@ router.get('/auth', authAccessToken, (req, res) => {
 });
 
 router.get('/profile', authAccessToken, (req, res) => {
-    console.log(req);
+    // console.log(req);
     getUser(req, res);
 });
 
