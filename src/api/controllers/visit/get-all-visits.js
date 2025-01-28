@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Visit from '../../../models/visits-model.js';
 import { NotFoundError } from '../../../utils/errors.js';
-import { asyncHandler, sendSuccess } from '../../../utils/response-handler.js';
+import { asyncHandler, sendError, sendSuccess } from '../../../utils/response-handler.js';
 import { getUserFromRedis } from '../../../utils/redis-fetch.js';
 
 const getAllVisits = async (req, res, next) => {
@@ -32,7 +32,7 @@ const getAllVisits = async (req, res, next) => {
 
     return sendSuccess(res, visits);
   } catch (error) {
-    return next(error);
+    return sendError(res, error);
   }
 };
 

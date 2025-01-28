@@ -7,10 +7,9 @@ import {
 } from '../controllers/record/index.js';
 import {
   createVisit,
-  // getAllVisits,
   getVisit,
-  // updateVisit,
-  // deleteVisit,
+  updateVisit,
+  deleteVisit,
   getAllVisits,
 } from '../controllers/visit/index.js';
 import {
@@ -88,8 +87,17 @@ router.get(
   getAllVisits
 );
 
-// router.put('/visits/:id', updateVisit);
-// router.delete('/visits/:id', deleteVisit);
+router.put('/visits/:id',
+  authenticate,
+  authorizeUser('updateVisit'),
+  updateVisit,
+);
+
+router.delete('/visits/:id', 
+  authenticate,
+  authorizeUser('deleteVisit'),
+  deleteVisit
+);
 
 // ---------------------- Surgery routes ---------------------- //
 router.post(
