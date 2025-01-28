@@ -34,9 +34,10 @@ export default [
     // Save a new audit log to track actions in the system
     await createAuditLog({
       medical_record_id: record._id,
+      doctor_id: req.auth.payload.sub,
       collection_name: 'medical_records',
       document_id: record._id,
-      action: 'GET',
+      action: 'VIEW',
       reason: 'Medical Record Viewed',
       req,
     });

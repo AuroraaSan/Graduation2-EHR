@@ -5,8 +5,7 @@ import { asyncHandler, sendSuccess } from '../../../utils/response-handler.js';
 
 export default [
   asyncHandler(async (req, res) => {
-    // const { role } = req;
-    // const caller_id = req.user.id;
+    const patient_id = req.auth.payload.sub;
     const { id: visit_id } = req.params;
 
     const visit = await Visit.findOne({ _id: visit_id }).lean();
@@ -15,17 +14,7 @@ export default [
       throw new NotFoundError('Visit', visit_id);
     }
 
-    visit.specialization = 'Abousaad';
-
-    // if (role === 'patient') {
-    //   if (visit.patient_id !== caller_id) {
-    //     throw new ForbiddenError();
-    //   }
-    // } else if (role === 'doctor') {
-    //   if (visit.doctor_id !== caller_id) {
-    //     throw new ForbiddenError();
-    //   }
-    // }
+    if (visit.patient_id !== patient_id) { throw new ForbiddenError(); }
 
     return sendSuccess(res, visit);
   }),

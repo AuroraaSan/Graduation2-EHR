@@ -3,7 +3,6 @@ import express from 'express';
 import {
   createRecord,
   getRecord,
-  // updateRecord,
   deleteRecord,
 } from '../controllers/record/index.js';
 import {
@@ -43,7 +42,7 @@ import {
   // deleteCondition
 } from '../controllers/condition/index.js';
 import { authAccessToken, authenticate } from '../middleware/auth-middleware.js';
-// import { authorizeUser } from '../middleware/access-middleware.js';
+import { authorizeUser } from '../middleware/access-middleware.js';
 
 const router = express.Router();
 
@@ -51,17 +50,16 @@ const router = express.Router();
 router.post(
   '/medical-records',
   authenticate,
-  // authorizeUser('createRecord'),
+  authorizeUser('createRecord'),
   createRecord
 );
 
 router.get(
   '/medical-records/:id',
-  // authorize(RecordAuthorization.getRecord),
+  authenticate,
+  authorizeUser('getRecord'),
   getRecord
 );
-
-// router.put('/medical-records/:id', updateRecord);
 
 router.delete(
   '/medical-records/:id',
@@ -72,20 +70,21 @@ router.delete(
 router.post(
   '/visits',
   authenticate,
-  // authorize(RecordAuthorization.createVisit),
+  authorizeUser('createVisit'),
   createVisit
 );
 
 router.get(
   '/visits/:id',
-  // authorize(RecordAuthorization.getVisit),
+  authenticate,
+  authorizeUser('getVisit'),
   getVisit
 );
 
 router.get(
   '/visits',
   authenticate,
-  // authorize(RecordAuthorization.getAllVisits),
+  authorizeUser('getAllVisits'),
   getAllVisits
 );
 

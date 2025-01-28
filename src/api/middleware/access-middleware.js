@@ -1,4 +1,5 @@
-import * as utils from '../../utils/utils-index.js';
+import { ForbiddenError } from '../../utils/errors.js';
+import { sendError } from '../../utils/response-handler.js';
 
 /**
  * Middleware to enforce role-based access control (RBAC).
@@ -12,7 +13,7 @@ export const authorizeUser = requiredRole => (req, res, next) => {
 
     // Check if the user has the required role
     if (!permissions.includes(requiredRole)) {
-      throw new utils.ForbiddenError('Forbidden: Insufficient permissions');
+      throw new ForbiddenError('Forbidden: Insufficient permissions');
     }
 
     // If authorized, proceed to the next middleware or controller
@@ -20,6 +21,6 @@ export const authorizeUser = requiredRole => (req, res, next) => {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Authorization error:', error);
-    return utils.sendError(res, error);
+    return sendError(res, error);
   }
 };
