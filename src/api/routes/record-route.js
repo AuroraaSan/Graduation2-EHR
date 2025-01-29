@@ -140,6 +140,8 @@ router.delete(
 // ---------------------- Medication routes ---------------------- //
 router.post(
   '/medications',
+  authenticate,
+  authorizeUser('createMedication'),
   createMedication
 );
 

@@ -2,8 +2,8 @@ import Joi from 'joi';
 
 export const createMedicationSchema = {
   body: {
-    medical_record_id: Joi.string().required(),
     medication_name: Joi.string().required(),
+    patient_id: Joi.string().required(),
     dosage: Joi.string().required(),
     frequency: Joi.string().required(),
     start_date: Joi.date().iso().required(),
