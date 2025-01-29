@@ -15,8 +15,8 @@ import {
 import {
   createSurgery,
   getSurgery,
-  // updateSurgery,
-  // deleteSurgery,
+  updateSurgery,
+  deleteSurgery,
   getAllSurgeries,
 } from '../controllers/surgery/index.js';
 import {
@@ -123,8 +123,19 @@ router.get(
   getSurgery
 );
 
-// router.put('/surgeries/:id', updateSurgery);
-// router.delete('/surgeries/:id', deleteSurgery);
+router.put(
+  '/surgeries/:id',
+  authenticate,
+  authorizeUser('updateSurgery'),
+  updateSurgery
+);
+
+router.delete(
+  '/surgeries/:id',
+  authenticate,
+  authorizeUser('deleteSurgery'),
+  deleteSurgery
+);
 
 // ---------------------- Medication routes ---------------------- //
 router.post(

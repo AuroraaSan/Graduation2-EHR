@@ -37,7 +37,6 @@ export const createVisitSchema = {
 
 export const updateVisitSchema = {
   body: {
-    date: Joi.date().iso().max('now'),
     visit_type: Joi.string().valid(
       'Regular',
       'Emergency',
