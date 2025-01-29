@@ -7,10 +7,10 @@ import * as utils from '../../utils/utils-index.js';
 export const authorizeUser = (requiredRole) => (req, res, next) => {
   try {
     // Extract the user's role from the token payload
-    const { role } = req.auth.payload;
+    const { permissions } = req.auth.payload;
 
     // Check if the user has the required role
-    if (role !== requiredRole) {
+    if (!permissions.includes(requiredRole)) {
       throw new utils.ForbiddenError('Forbidden: Insufficient permissions');
     }
 
