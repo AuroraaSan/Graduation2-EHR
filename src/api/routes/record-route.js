@@ -22,7 +22,7 @@ import {
 import {
   createMedication,
   getMedication,
-  // updateMedication,
+  updateMedication,
   deleteMedication,
   getAllMedications,
 } from '../controllers/medication/index.js';
@@ -159,12 +159,12 @@ router.get(
   getMedication
 );
 
-// router.put(
-//   '/medications/:id',
-//   authenticate,
-//   authorizeUser('updateMedication'),
-//   updateMedication
-// );
+router.put(
+  '/medications/:id',
+  authenticate,
+  authorizeUser('updateMedication'),
+  updateMedication
+);
 
 router.delete(
   '/medications/:id',

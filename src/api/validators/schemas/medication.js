@@ -25,3 +25,28 @@ export const createMedicationSchema = {
     prescription_id: Joi.string(),
   },
 };
+
+export const updateMedicationSchema = {
+  body: {
+    medication_name: Joi.string(),
+    dosage: Joi.string(),
+    frequency: Joi.string(),
+    start_date: Joi.date().iso(),
+    end_date: Joi.date().iso().min(Joi.ref('start_date')),
+    condition: Joi.string(),
+    route_of_administration: Joi.string().valid(
+      'Oral',
+      'Intravenous',
+      'Intramuscular',
+      'Subcutaneous',
+      'Topical',
+      'Inhalation',
+      'Other'
+    ),
+    side_effects: Joi.array().items(Joi.string()),
+    contraindications: Joi.array().items(Joi.string()),
+    refills_remaining: Joi.number().min(0),
+    pharmacy_notes: Joi.string(),
+    prescription_id: Joi.string(),
+  },
+};
