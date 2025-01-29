@@ -21,10 +21,10 @@ import {
 } from '../controllers/surgery/index.js';
 import {
   createMedication,
-  // getMedication,
+  getMedication,
   // updateMedication,
-  // deleteMedication,
-  // getAllMedications
+  deleteMedication,
+  getAllMedications,
 } from '../controllers/medication/index.js';
 import {
   createAllergy,
@@ -145,10 +145,33 @@ router.post(
   createMedication
 );
 
-// router.get('/medications', getAllMedications);
-// router.get('/medications/:id', getMedication);
-// router.put('/medications/:id', updateMedication);
-// router.delete('/medications/:id', deleteMedication);
+router.get(
+  '/medications',
+  authenticate,
+  authorizeUser('getAllMedications'),
+  getAllMedications
+);
+
+router.get(
+  '/medications/:id',
+  authenticate,
+  authorizeUser('getMedication'),
+  getMedication
+);
+
+// router.put(
+//   '/medications/:id',
+//   authenticate,
+//   authorizeUser('updateMedication'),
+//   updateMedication
+// );
+
+router.delete(
+  '/medications/:id',
+  authenticate,
+  authorizeUser('deleteMedication'),
+  deleteMedication
+);
 
 // ---------------------- Allergy routes ---------------------- //
 router.post(

@@ -3,7 +3,6 @@ import Visit from '../../../models/visits-model.js';
 import { ForbiddenError, NotFoundError } from '../../../utils/errors.js';
 import { asyncHandler, sendError, sendSuccess } from '../../../utils/response-handler.js';
 
-
 const getVisit = async (req, res) => {
   try {
     const patient_id = req.auth.payload.sub;
