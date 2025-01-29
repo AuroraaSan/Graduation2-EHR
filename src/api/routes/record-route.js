@@ -28,17 +28,17 @@ import {
 } from '../controllers/medication/index.js';
 import {
   createAllergy,
-  // getAllergy,
-  // getAllAllergies,
-  // updateAllergy,
-  // deleteAllergy
+  getAllergy,
+  getAllAllergies,
+  updateAllergy,
+  deleteAllergy,
 } from '../controllers/allergy/index.js';
 import {
   createCondition,
-  // getCondition,
-  // getAllConditions,
-  // updateCondition,
-  // deleteCondition
+  getCondition,
+  getAllConditions,
+  updateCondition,
+  deleteCondition,
 } from '../controllers/condition/index.js';
 import { authAccessToken, authenticate } from '../middleware/auth-middleware.js';
 import { authorizeUser } from '../middleware/access-middleware.js';
@@ -176,18 +176,73 @@ router.delete(
 // ---------------------- Allergy routes ---------------------- //
 router.post(
   '/allergies',
+  authenticate,
+  authorizeUser('createAllergy'),
   createAllergy
 );
 
-// router.get('/allergies', getAllAllergies);
-// router.get('/allergies/:id', getAllergy);
-// router.put('/allergies/:id', updateAllergy);
-// router.delete('/allergies/:id', deleteAllergy);
+router.get(
+  '/allergies',
+  authenticate,
+  authorizeUser('getAllAllergies'),
+  getAllAllergies
+);
+
+router.get(
+  '/allergies/:id',
+  authenticate,
+  authorizeUser('getAllergy'),
+  getAllergy
+);
+
+router.put(
+  '/allergies/:id',
+  authenticate,
+  authorizeUser('updateAllergy'),
+  updateAllergy
+);
+
+router.delete(
+  '/allergies/:id',
+  authenticate,
+  authorizeUser('deleteAllergy'),
+  deleteAllergy
+);
 
 // ---------------------- Medical Conditions routes ---------------------- //
 router.post(
   '/conditions',
+  authenticate,
+  authorizeUser('createCondition'),
   createCondition
+);
+
+router.get(
+  '/conditions',
+  authenticate,
+  authorizeUser('getAllConditions'),
+  getAllConditions
+);
+
+router.get(
+  '/conditions/:id',
+  authenticate,
+  authorizeUser('getCondition'),
+  getCondition
+);
+
+router.put(
+  '/conditions/:id',
+  authenticate,
+  authorizeUser('updateCondition'),
+  updateCondition
+);
+
+router.delete(
+  '/conditions/:id',
+  authenticate,
+  authorizeUser('deleteCondition'),
+  deleteCondition
 );
 
 router.get(
@@ -197,10 +252,5 @@ router.get(
     res.send({ authenticated: true });
   }
 );
-
-// router.get('/conditions', getAllConditions);
-// router.get('/conditions/:id', getCondition);
-// router.put('/conditions/:id', updateCondition);
-// router.delete('/conditions/:id', deleteCondition);
 
 export default router;
