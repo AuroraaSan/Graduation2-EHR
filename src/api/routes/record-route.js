@@ -17,7 +17,7 @@ import {
   // getSurgery,
   // updateSurgery,
   // deleteSurgery,
-  // getAllSurgeries,
+  getAllSurgeries,
 } from '../controllers/surgery/index.js';
 import {
   createMedication,
@@ -109,7 +109,13 @@ router.post(
   createSurgery
 );
 
-// router.get('/surgeries', getAllSurgeries);
+router.get(
+  '/surgeries',
+  authenticate,
+  authorizeUser('getAllSurgeries'),
+  getAllSurgeries
+);
+
 // router.get('/surgeries/:id', getSurgery);
 // router.put('/surgeries/:id', updateSurgery);
 // router.delete('/surgeries/:id', deleteSurgery);
