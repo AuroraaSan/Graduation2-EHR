@@ -2,6 +2,7 @@ import * as validate from '../../validators/user-validator.js';
 import * as utils from '../../../utils/utils-index.js';
 import { Patient, Doctor, Admin, Admission} from '../../../models/models-index.js';
 import { v4 as uuidv4 } from 'uuid';
+import { redisClient } from '../../../loaders/redis-loader.js';
 
 export default async (req, res) => {
     try {
@@ -45,6 +46,10 @@ export default async (req, res) => {
             hospital_id: doctor.hospital_id,
             discharge_date,
         });
+
+        await redisClient.set(`admission:${admission.id}`, JSON.stringify(admission));
+
+        await redisClient.expire(`admission:${admission.id}`, 604800); // one week
 
         res.status(201).send(admission);
     } catch (error) {
