@@ -148,11 +148,11 @@ export const register = async (req, res) => {
       );
     }
 
-    const recordCreationSuccessful = await createMedicalRecord({ patient_id: user.id, blood_type: "AB+", weight: 76, height: 176 });
+    // const recordCreationSuccessful = await createMedicalRecord({ patient_id: user.id, blood_type: "AB+", weight: 76, height: 176 });
 
-    if (!recordCreationSuccessful) {
-      console.log('Error creating medical record');
-    }
+    // if (!recordCreationSuccessful) {
+    //   console.log('Error creating medical record');
+    // }
 
     await redisClient.hSet(`user:${user.id}`, {
       user: JSON.stringify(user),
