@@ -47,9 +47,9 @@ export default async (req, res) => {
             discharge_date,
         });
 
-        await redisClient.set(`admission:${admission.id}`, JSON.stringify(admission));
+        await redisClient.set(`admission:${admission.patient_id}:${admission.doctor_id}`, JSON.stringify(admission));
 
-        await redisClient.expire(`admission:${admission.id}`, 604800); // one week
+        await redisClient.expire(`admission:${admission.patient_id}:${admission.doctor_id}`, 604800); // one week
 
         res.status(201).send(admission);
     } catch (error) {
