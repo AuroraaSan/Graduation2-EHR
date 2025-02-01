@@ -1,19 +1,18 @@
 import { MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, asyncHandler, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import {
-  // ForbiddenError,
+  ForbiddenError,
   NotFoundError,
 } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { getRecordSchema } from '../../validators/schemas/index.js';
+import { VerifyAdmissionStatus } from '../../../utils/redis-fetch.js';
 
-export default [
-  validate(getRecordSchema),
-  asyncHandler(async (req, res) => {
+const getRecord = async (req, res) => {
+  try {
+    validate(getRecordSchema);
     const { id: patient_id } = req.params;
-    // const { role } = req;
-    // const caller_id = req.user.id;
 
     // Check if medical record already exists
     const record = await MedicalRecord.findOne({ patient_id }).lean();
@@ -24,12 +23,11 @@ export default [
       );
     }
 
-    // need to check here if doctor is assigned to patient
-    // if (role === 'patient') {
-    //   if (record.patient_id !== caller_id) {
-    //     throw new ForbiddenError();
-    //   }
-    // }
+    const doctor_id = req.auth.payload.sub;
+
+    if (await VerifyAdmissionStatus(patient_id, doctor_id) === false) {
+      throw new ForbiddenError('Doctor is not assigned to this patient');
+    }
 
     // Save a new audit log to track actions in the system
     await createAuditLog({
@@ -43,5 +41,9 @@ export default [
     });
 
     return sendSuccess(res, record);
-  }),
-];
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
+export default asyncHandler(getRecord);
