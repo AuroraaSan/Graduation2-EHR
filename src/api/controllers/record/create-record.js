@@ -3,14 +3,21 @@ import { sendSuccess, asyncHandler, sendError } from '../../../utils/response-ha
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import {
   ConflictError,
+  ForbiddenError,
 } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { createRecordSchema } from '../../validators/schemas/index.js';
+import { VerifyAdmissionStatus } from '../../../utils/redis-fetch.js';
 
 const createRecord = async (req, res) => {
   try {
     validate(createRecordSchema);
     const { patient_id, blood_type, weight, height } = req.body;
+    const doctor_id = req.auth.payload.sub;
+
+    if (await VerifyAdmissionStatus(patient_id, doctor_id) === false) {
+      throw new ForbiddenError('Doctor is not assigned to this patient');
+    }
 
     // Check if medical record already exists
     const existingRecord = await MedicalRecord.findOne({ patient_id }, { _id: 1 }).lean();

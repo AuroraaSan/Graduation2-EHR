@@ -1,9 +1,10 @@
 import { Allergy, MedicalRecord } from '../../../models/models-index.js';
 import { sendSuccess, asyncHandler, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
-import { NotFoundError, ValidationError } from '../../../utils/errors.js';
+import { ForbiddenError, NotFoundError, ValidationError } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { createAllergySchema } from '../../validators/schemas/index.js';
+import { VerifyAdmissionStatus } from '../../../utils/redis-fetch.js';
 
 const createAllergy = async (req, res) => {
   try {
@@ -26,8 +27,13 @@ const createAllergy = async (req, res) => {
     } = req.body;
 
     const doctor_id = req.auth.payload.sub;
+
     if (!doctor_id) {
       throw new ValidationError('Doctor ID not provided', { field: 'doctor_id' });
+    }
+
+    if (await VerifyAdmissionStatus(patient_id, doctor_id) === false) {
+      throw new ForbiddenError('Doctor is not assigned to this patient');
     }
 
     // Verify medical record exists
