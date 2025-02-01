@@ -27,10 +27,11 @@ export default async (req, res) => {
 
         if (admin.hospital_id !== doctor.hospital_id) throw new utils.ForbiddenError();
 
-        // check if the patient is already admitted in the hospital
+        // check if the patient is already admitted in the hospital with the same doctor
         const oldAdmission = await Admission.findOne({
             where: {
                 patient_id,
+                doctor_id,
                 hospital_id: doctor.hospital_id,
                 discharge_date: null,
             }
@@ -47,12 +48,7 @@ export default async (req, res) => {
             discharge_date,
         });
 
-        await redisClient.hSet(
-          `admission:${admission.patient_id}:${admission.doctor_id}`,
-          Object.entries(admission).flat()
-        );
-
-        await redisClient.expire(`admission:${admission.patient_id}:${admission.doctor_id}`, 604800); // one week
+        await redisClient.sAdd('admissions', `admission:${patient_id}:${doctor_id}`);
 
         res.status(201).send(admission);
     } catch (error) {

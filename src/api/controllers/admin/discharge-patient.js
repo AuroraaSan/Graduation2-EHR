@@ -26,6 +26,8 @@ export default async (req, res) => {
         admission.discharge_date = new Date();
         await admission.save();
 
+        await redisClient.sRem('admissions', `admission:${patientId}:${doctorId}`);
+
         res.status(200).send({
             message: 'Patient discharged successfully'
         });
