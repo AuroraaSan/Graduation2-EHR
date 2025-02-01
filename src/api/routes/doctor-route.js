@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login, logout, verifyEmail, resendEmail, forgotPassword, resetPassword, refreshToken, changePassword, editDoctor, getDoctor, deleteDoctor } from '../controllers/doctor-controller-index.js';
+import { register, login, logout, verifyEmail, resendEmail, forgotPassword, resetPassword, refreshToken, changePassword, editDoctor, getDoctor, deleteDoctor, viewPatientByNationalId } from '../controllers/doctor-controller-index.js';
 import { authorizeUser, authAccessToken } from '../middleware/middleware-index.js';
 
 const router = Router();
@@ -43,5 +43,6 @@ router.patch('/edit', authAccessToken, editDoctor);
 
 router.get('/profile', authAccessToken, getDoctor);
 router.delete('/delete', authAccessToken, deleteDoctor);
+router.get('/patient/:id', authAccessToken, viewPatientByNationalId);
 
 export default router
