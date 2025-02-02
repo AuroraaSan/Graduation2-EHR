@@ -28,6 +28,9 @@ import RequestAddition from "./components/PatientPages/RequestAddition"
 import ExaminationsDetails from "./components/PatientPages/ExaminationsDetails"
 import History from "./components/PatientPages/History"
 import Hospitals from "./components/PatientPages/Hospitals"
+import MedicalRecordForm from "./components/MedicalRecord/MedicalRecordForm";
+import XRayUploader from "./components/Xray/Xray";
+import Chatbot from "./components/chatbot/chatbot";
 
 function App() {
   const {user} = useUser(); // Get the user and setUser from the UserContext
@@ -58,6 +61,11 @@ function App() {
       <Route path="/add-patient" element={<AddPatient />} />
       <Route path="/patient-table" element={<PatientTable />} />
       <Route path="/AiHistory" element={<AiHistory />} />
+      <Route path="/MedicalForm" element={<MedicalRecordForm />} />
+      <Route path="/Xray" element={<XRayUploader />} />
+      <Route path="/chatbot" element={<Chatbot />} />
+
+
 
       {/*Patient*/}
       <Route path="/PatientDashboard" element={<PatientDashboard />} />

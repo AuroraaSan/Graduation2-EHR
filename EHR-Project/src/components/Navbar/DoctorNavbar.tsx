@@ -5,21 +5,24 @@ import { FaBell } from 'react-icons/fa';
 // Doctor Navbar Component
 const DoctorNavbar: React.FC = () => (
   <nav className="flex justify-start items-center p-4 border-b border-gray-200">
-    <NavLink to="/PatientDashboard" className="text-blue-600 font-bold text-lg mr-8">
+    <NavLink to="/DoctorDashboard" className="text-blue-600 font-bold text-lg mr-8">
       EHR PROJECT
     </NavLink>
     <div className="flex space-x-6">
       <NavLink to="#" className="text-gray-700 hover:text-blue-600">
         Patients
       </NavLink>
-      <NavLink to="#" className="text-gray-700 hover:text-blue-600">
+      <NavLink to="/AiHistory" className="text-gray-700 hover:text-blue-600">
         Generate History
       </NavLink>
-      <NavLink to="#" className="text-gray-700 hover:text-blue-600">
+      <NavLink to="/MedicalRecord" className="text-gray-700 hover:text-blue-600">
         Create new medical record
       </NavLink>
-      <NavLink to="#" className="text-gray-700 hover:text-blue-600">
+      <NavLink to="/Xray" className="text-gray-700 hover:text-blue-600">
         Lab Results
+      </NavLink>
+      <NavLink to="/chatbot" className="text-gray-700 hover:text-blue-600">
+        Chat
       </NavLink>
     </div>
     <div className="flex items-center space-x-4 ml-auto">

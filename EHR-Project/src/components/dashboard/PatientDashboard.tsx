@@ -1,8 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { NavLink } from 'react-router-dom';
 import PatientNavbar from '../Navbar/PatientNavbar';
+import Chatbot from '../chatbot/chatbot';
+import { BsChatDotsFill } from "react-icons/bs"; 
 
-const PatientDashboard: React.FC = () => (
+
+const PatientDashboard: React.FC = () => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+return(
   <div>
     <PatientNavbar />
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -33,7 +39,21 @@ const PatientDashboard: React.FC = () => (
         </div>
       </div>
     </div>
+    <button 
+        onClick={() => setIsChatOpen(!isChatOpen)}
+        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition"
+      >
+        <BsChatDotsFill size={24} />
+      </button>
+
+      {/* Chatbot Window */}
+      {isChatOpen && (
+        <div className="fixed bottom-20 right-6 bg-white w-96 h-96 p-4 shadow-xl rounded-xl border border-gray-300">
+          <Chatbot />
+        </div>
+      )}
   </div>
 );
+};
 
 export default PatientDashboard;

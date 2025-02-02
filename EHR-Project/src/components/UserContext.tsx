@@ -8,6 +8,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  id: string
 }
 
 interface UserContextType {
@@ -42,6 +43,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             name: response.data.data.user.full_name,
             email: response.data.data.user.email,
             role: response.data.data.user.role,
+            id: response.data.data.user.id
           };
           setUser(userData); // Set the user if a valid session exists
           localStorage.setItem('user', JSON.stringify(userData));

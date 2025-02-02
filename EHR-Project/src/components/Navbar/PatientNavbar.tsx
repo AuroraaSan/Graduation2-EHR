@@ -20,8 +20,8 @@ const PatientNavbar: React.FC = () => {
         <NavLink to="/Hospitals" className="text-gray-700 hover:text-blue-600">
           Hospitals
         </NavLink>
-        <NavLink to="#" className="text-gray-700 hover:text-blue-600">
-          About us
+        <NavLink to="/chatbot" className="text-gray-700 hover:text-blue-600">
+          Chat
         </NavLink>
       </div>
       <div className="flex items-center space-x-2 ml-auto">
