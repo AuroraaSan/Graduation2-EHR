@@ -16,7 +16,6 @@ export default async (req, res) => {
         const admissions = await Admission.findAll({
             where: {
                 hospital_id: admin.hospital_id,
-                discharge_date: null
             },
         });
 
