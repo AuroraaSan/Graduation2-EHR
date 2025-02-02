@@ -1,4 +1,4 @@
-import { Admin, Admission, Doctor } from "../../../models/models-index.js";
+import { Admin, Admission, Doctor, Patient } from "../../../models/models-index.js";
 import { UnauthorizedError } from "../../../utils/error-handler.js";
 import { sendError } from "../../../utils/response-handler.js";
 
@@ -23,9 +23,15 @@ export default async (req, res) => {
             const doctor = await Doctor.findByPk(admission.doctor_id, {
                 attributes: ['full_name']
             });
+
+            const patient = await Patient.findByPk(admission.patient_id, {
+                attributes: ['full_name']
+            });
+
             return {
                 ...admission.toJSON(),
-                doctor_name: doctor.full_name
+                doctor_name: doctor.full_name,
+                patient_name: patient.full_name
             };
         }));
 
