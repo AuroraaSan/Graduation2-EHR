@@ -1,19 +1,17 @@
 import { Surgery, MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import { NotFoundError, ValidationError } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { createSurgerySchema } from '../../validators/schemas/index.js';
 
-export default [
-  validate(createSurgerySchema),
-  asyncHandler(async (req, res) => {
-    const {
-      medical_record_id,
-      type,
-      procedure_date,
-      hospital,
-      assistant_surgeon_ids,
+export const createSurgery = async (req, res) => {
+  const {
+    medical_record_id,
+    type,
+    procedure_date,
+    hospital,
+    assistant_surgeon_ids,
       anesthesiologist_id,
       pre_op_diagnosis,
       estimated_blood_loss,
@@ -23,7 +21,8 @@ export default [
       emergency,
       images,
     } = req.body;
-
+    
+    validate(createSurgerySchema);
     const doctor_id = req.body?.doctor_id;
     if (!doctor_id) {
       throw new ValidationError('Doctor ID not provided', { field: 'doctor_id' });
@@ -76,5 +75,4 @@ export default [
     });
 
     return sendSuccess(res, savedSurgery, 'Surgery scheduled successfully', 201);
-  }),
-];
+  };

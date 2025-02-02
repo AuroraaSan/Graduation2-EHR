@@ -1,5 +1,5 @@
-import { auth } from 'express-oauth2-jwt-bearer';
-import { auth0_audience, auth0_domain } from '../../config/config.js';
+import { auth } from "express-oauth2-jwt-bearer";
+import { auth0_audience, auth0_domain } from "../../config/config.js";
 
 // Middleware to validate JWTs issued by Auth0
 export const authAccessToken = auth({
@@ -8,9 +8,9 @@ export const authAccessToken = auth({
 });
 
 export const authenticate = (req, res, next) => {
-  authAccessToken(req, res, err => {
+  authAccessToken(req, res, (err) => {
     if (err) {
-      return res.status(401).send('Unauthorized');
+      return res.status(401).send({ authenticated: false });
     }
     return next();
   });

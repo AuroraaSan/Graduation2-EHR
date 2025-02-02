@@ -1,15 +1,14 @@
 import { Condition, MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import { NotFoundError, ValidationError } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { createConditionSchema } from '../../validators/schemas/index.js';
 
-export default [
-  validate(createConditionSchema),
-  asyncHandler(async (req, res) => {
+export const createCondition = async (req, res) => {
+    validate(createConditionSchema);
     const {
-      medical_record_id,
+      patient_id,
       condition_name,
       diagnosis_date,
       status,
@@ -25,13 +24,13 @@ export default [
     }
 
     // Verify medical record exists
-    const medicalRecord = await MedicalRecord.findById(medical_record_id);
+    const medicalRecord = await MedicalRecord.findOne({ patient_id }).lean();
     if (!medicalRecord) {
-      throw new NotFoundError('Medical Record', medical_record_id);
+      throw new NotFoundError(`Medical Record for patient with ID: ${patient_id}, not found.`);
     }
 
     const condition = new Condition({
-      medical_record_id,
+      medical_record_id: medicalRecord._id,
       condition_name,
       diagnosis_date,
       status,
@@ -46,12 +45,11 @@ export default [
 
     // Update medical record with the new condition
     await MedicalRecord.findByIdAndUpdate(
-      medical_record_id,
+      medicalRecord._id,
       { $push: { medical_conditions: savedCondition._id } }
     );
 
     await createAuditLog({
-      medical_record_id,
       collection_name: 'conditions',
       document_id: savedCondition._id,
       action: 'CREATE',
@@ -64,5 +62,4 @@ export default [
     });
 
     return sendSuccess(res, savedCondition, 'Medical condition added successfully', 201);
-  }),
-];
+  };

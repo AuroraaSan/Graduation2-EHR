@@ -1,13 +1,12 @@
 import { Allergy, MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import { NotFoundError, ValidationError } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { createAllergySchema } from '../../validators/schemas/index.js';
 
-export default [
-  validate(createAllergySchema),
-  asyncHandler(async (req, res) => {
+export const createAllergy = async (req, res) => {
+    validate(createAllergySchema);
     const {
       medical_record_id,
       allergen_name,
@@ -71,5 +70,4 @@ export default [
     });
 
     return sendSuccess(res, savedAllergy, 'Allergy documented successfully', 201);
-  }),
-];
+  };

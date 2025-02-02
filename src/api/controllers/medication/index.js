@@ -1,1 +1,1 @@
-export { default as createMedication } from './create-medication.js';
+export { createMedication } from './create-medication.js';

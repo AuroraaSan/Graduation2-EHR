@@ -1,1 +1,1 @@
-export { default as createAllergy } from './create-allergy.js';
+export { createAllergy } from './create-allergy.js';

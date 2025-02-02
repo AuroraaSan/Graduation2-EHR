@@ -1,7 +1,6 @@
 import { AuditLog } from '../models/models-index.js';
 
 export const createAuditLog = async ({
-  medical_record_id,
   collection_name,
   document_id,
   action,
@@ -13,7 +12,6 @@ export const createAuditLog = async ({
 }) => {
   try {
     const auditLog = new AuditLog({
-      medical_record_id,
       collection_name,
       document_id,
       action,

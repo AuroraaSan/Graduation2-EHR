@@ -1,5 +1,5 @@
 import { MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import {
   NotFoundError,
@@ -7,9 +7,8 @@ import {
 import { validate } from '../../validators/validator.js';
 import { deleteRecordSchema } from '../../validators/schemas/index.js';
 
-export default [
-  validate(deleteRecordSchema),
-  asyncHandler(async (req, res) => {
+export const deleteRecord = async (req, res) => {
+    validate(deleteRecordSchema);
     const { id: patient_id } = req.params;
 
     const record = await MedicalRecord.findOne({ patient_id }, { _id: 1 }).lean();
@@ -36,5 +35,4 @@ export default [
     });
 
     return sendSuccess(res, null, 'Medical record deleted successfully', 204);
-  }),
-];
+  }

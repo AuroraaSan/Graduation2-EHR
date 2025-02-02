@@ -1,1 +1,1 @@
-export { default as createCondition } from './create-condition.js';
+export { createCondition } from './create-condition.js';

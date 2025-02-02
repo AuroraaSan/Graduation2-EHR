@@ -1,47 +1,44 @@
-/* eslint-disable max-classes-per-file */
 class BaseError extends Error {
-  constructor(message, statusCode = 500, details = null, errorType = 'BaseError') {
+  constructor(message, statusCode = 500, details = null) {
     super(message);
     this.statusCode = statusCode;
     this.details = details;
-    this.errorType = errorType;
-    this.name = this.constructor.name;
-    Error.captureStackTrace(this, this.constructor);
   }
 }
 
 class NotFoundError extends BaseError {
-  constructor(resource, id = null, details = null) {
-    const message = id
-      ? `Resource Not Found: ${resource} with ID ${id} does not exist`
-      : `Resource Not Found: ${resource} does not exist`;
-    super(message, 404, details, 'NotFoundError');
+  constructor(details = null, message = 'Resource not found') {
+    super(message, 404, details);
   }
 }
 
 class ValidationError extends BaseError {
-  constructor(message, details = null) {
-    const formattedMessage = `Schema Validation Error: ${message}`;
-    super(formattedMessage, 400, details, 'SchemaValidationError');
+  constructor(details = null, message = 'Validation failed') {
+    super(message, 400, details);
   }
 }
 
 class UnauthorizedError extends BaseError {
-  constructor(message = 'Authentication required to access this resource', details = null) {
-    super(message, 401, details, 'UnauthorizedError');
+  constructor(details = null, message = 'Unauthorized access') {
+    super(message, 401, details);
   }
 }
 
 class ForbiddenError extends BaseError {
-  constructor(message = 'You do not have permission to access this resource', details = null) {
-    super(message, 403, details, 'ForbiddenError');
+  constructor(details = null, message = 'Forbidden access') {
+    super(message, 403, details);
+  }
+}
+
+class InternalServerError extends BaseError {
+  constructor(details = null, message = 'Internal server error') {
+    super(message, 500, details);
   }
 }
 
 class ConflictError extends BaseError {
-  constructor(resource, field, value, details = null) {
-    const message = `Resource Conflict: ${resource} with ${field} "${value}" already exists`;
-    super(message, 409, details, 'ConflictError');
+  constructor(details = null, message = 'Conflict error') {
+    super(message, 409, details);
   }
 }
 
@@ -51,5 +48,6 @@ export {
   ValidationError,
   UnauthorizedError,
   ForbiddenError,
+  InternalServerError,
   ConflictError,
 };

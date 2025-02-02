@@ -1,11 +1,11 @@
 import { Visit, MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import { NotFoundError } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { createVisitSchema } from '../../validators/schemas/index.js';
 
-const createVisit = async (req, res) => {
+export const createVisit = async (req, res) => {
   validate(createVisitSchema);
   const {
     patient_id,
@@ -84,5 +84,3 @@ const createVisit = async (req, res) => {
 
   return sendSuccess(res, savedVisit, 'Visit recorded successfully', 201);
 };
-
-export default asyncHandler(createVisit);

@@ -1,1 +1,1 @@
-export { default as createSurgery } from './create-surgery.js';
+export { createSurgery } from './create-surgery.js';

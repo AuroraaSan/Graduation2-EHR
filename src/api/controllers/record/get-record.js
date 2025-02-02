@@ -1,22 +1,28 @@
 import { MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import {
-  // ForbiddenError,
+  ForbiddenError,
   NotFoundError,
 } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { getRecordSchema } from '../../validators/schemas/index.js';
 
-export default [
-  validate(getRecordSchema),
-  asyncHandler(async (req, res) => {
+export const getRecord = async (req, res) => {
+    validate(getRecordSchema);
     const { id: patient_id } = req.params;
+    const { doctor_id } = req.body;
+
+    if (!doctor_id) {
+      throw new ForbiddenError('Doctor ID not provided');
+    }
+    console.log(patient_id);
     // const { role } = req;
     // const caller_id = req.user.id;
 
     // Check if medical record already exists
-    const record = await MedicalRecord.findOne({ patient_id }).lean();
+    const record = await MedicalRecord.findOne({ patient_id }).populate('medical_conditions').lean();
+    console.log(record);
     if (!record) {
       throw new NotFoundError(
         `Medical record does not exist for patient ${patient_id}`,
@@ -36,11 +42,11 @@ export default [
       medical_record_id: record._id,
       collection_name: 'medical_records',
       document_id: record._id,
-      action: 'GET',
+      action: 'VIEW',
       reason: 'Medical Record Viewed',
       req,
+      doctor_id,
     });
 
     return sendSuccess(res, record);
-  }),
-];
+  };

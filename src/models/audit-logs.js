@@ -3,11 +3,6 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const auditLogSchema = new Schema({
-  medical_record_id: {
-    type: Schema.Types.ObjectId,
-    ref: 'MedicalRecord',
-    required: true,
-  },
   collection_name: {
     type: String,
     enum: ['medical_records', 'conditions', 'medications', 'surgeries', 'visits', 'allergies', 'lifestyle'],

@@ -1,5 +1,5 @@
 import { MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import {
   ConflictError,
@@ -7,7 +7,7 @@ import {
 import { validate } from '../../validators/validator.js';
 import { createRecordSchema } from '../../validators/schemas/index.js';
 
-const createRecord = async (req, res) => {
+export const createRecord = async (req, res) => {
   validate(createRecordSchema);
   const { patient_id, blood_type, weight, height } = req.body;
 
@@ -46,5 +46,3 @@ const createRecord = async (req, res) => {
 
   return sendSuccess(res, savedRecord, 'Medical record created successfully', 201);
 };
-
-export default asyncHandler(createRecord);

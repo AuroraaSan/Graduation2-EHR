@@ -1,13 +1,12 @@
 import { Medication, MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, asyncHandler } from '../../../utils/response-handler.js';
+import { sendSuccess, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
 import { NotFoundError, ValidationError } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { createMedicationSchema } from '../../validators/schemas/index.js';
 
-export default [
-  validate(createMedicationSchema), // Validation middleware will run before the controller
-  asyncHandler(async (req, res) => {
+export const createMedication = async (req, res) => {
+    validate(createMedicationSchema); // Validation middleware will run before the controller
     const {
       medical_record_id,
       medication_name,
@@ -76,5 +75,4 @@ export default [
     });
 
     return sendSuccess(res, savedMedication, 'Medication prescribed successfully', 201);
-  }),
-];
+  };

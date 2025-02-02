@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import Visit from '../../../models/visits-model.js';
 import { NotFoundError } from '../../../utils/errors.js';
-import { asyncHandler, sendSuccess } from '../../../utils/response-handler.js';
+import { sendError, sendSuccess } from '../../../utils/response-handler.js';
 import { getUserFromRedis } from '../../../utils/redis-fetch.js';
 
-const getAllVisits = async (req, res, next) => {
+export const getAllVisits = async (req, res, next) => {
   try {
     const user_id = req.auth.payload.sub;
     const { limit = -1, skip = 0 } = req.query;
@@ -51,5 +51,3 @@ const getAllVisits = async (req, res, next) => {
     return next(error);
   }
 };
-
-export default asyncHandler(getAllVisits);

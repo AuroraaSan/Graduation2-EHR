@@ -1,10 +1,9 @@
 import _ from 'lodash';
 import Visit from '../../../models/visits-model.js';
 import { ForbiddenError, NotFoundError } from '../../../utils/errors.js';
-import { asyncHandler, sendSuccess } from '../../../utils/response-handler.js';
+import { sendError, sendSuccess } from '../../../utils/response-handler.js';
 
-export default [
-  asyncHandler(async (req, res) => {
+export const getVisit = async (req, res) => {
     // const { role } = req;
     // const caller_id = req.user.id;
     const { id: visit_id } = req.params;
@@ -28,5 +27,4 @@ export default [
     // }
 
     return sendSuccess(res, visit);
-  }),
-];
+  };
