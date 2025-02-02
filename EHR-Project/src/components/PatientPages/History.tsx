@@ -17,7 +17,7 @@ const History: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Mock data with a structure matching the original expectations
+        //const response = await axios.get('http://localhost:3001/api/history');
         const mockData = {
           Allergies: 'Patient has a history of headaches.',
           Chronic_conditions: 'Migraine',

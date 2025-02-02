@@ -12,11 +12,7 @@ interface Request {
 }
 
 const PatientRequests: React.FC = () => {
-  const [requests, setRequests] = useState<Request[]>([
-    { reqid: 1, name: 'John Doe', issuedDate: '2023-10-01', description: 'Heart Checkup', dataDate: '2023-10-01', status: 'Pending' },
-    { reqid: 2, name: 'Jane Smith', issuedDate: '2023-09-15', description: 'Blood Test', dataDate: '2023-09-15', status: 'Accepted' },
-    { reqid: 3, name: 'Alice Johnson', issuedDate: '2023-08-20', description: 'X-Ray', dataDate: '2023-08-20', status: 'Rejected' },
-  ]);
+  const [requests, setRequests] = useState<Request[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<Request[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -27,21 +23,25 @@ const PatientRequests: React.FC = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       setLoading(true);
-      /*try {
-        const response = await axios.get('#');
-        setRequests(response.data);
-        setFilteredRequests(response.data);
+      try {
+        // const response = await axios.get('http://localhost:3001/api/requests');
+        const mockData: Request[] = [
+          { reqid: 1, name: 'John Doe', issuedDate: '2023-10-01', description: 'Heart Checkup', dataDate: '2023-10-01', status: 'Pending' },
+          { reqid: 2, name: 'Jane Smith', issuedDate: '2023-09-15', description: 'Blood Test', dataDate: '2023-09-15', status: 'Accepted' },
+          { reqid: 3, name: 'Alice Johnson', issuedDate: '2023-08-20', description: 'X-Ray', dataDate: '2023-08-20', status: 'Rejected' }
+        ];
+        setRequests(mockData);
+        setFilteredRequests(mockData);
       } catch (err) {
-        setError('Failed to load requests. Please try again later.');
+        setError('Failed to load requests');
         console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
-      }*/
+      }
     };
-
+  
     fetchRequests();
   }, []);
-
   useEffect(() => {
     const filtered = requests.filter((request) =>
       request.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -70,12 +70,10 @@ const PatientRequests: React.FC = () => {
 
   const handleSend = (reqid: number) => {
     const request = requests.find(req => req.reqid === reqid);
-    if (request) {
-      if (request.status === 'Rejected' || request.status === 'Accepted') {
-        console.log(`Request with ID: ${reqid} has status '${request.status}' and cannot be sent for review.`);
-      } else {
-        console.log(`Send request with ID: ${reqid}`);
-      }
+    if (request && request.status === 'Pending') {
+      console.log(`Send request with ID: ${reqid}`);
+    } else {
+      console.log(`Request with ID: ${reqid} cannot be sent for review.`);
     }
   };
 
@@ -126,13 +124,12 @@ const PatientRequests: React.FC = () => {
                   <td className={`border-b py-2 ${
                     request.status === 'Accepted' ? 'text-green-500' :
                     request.status === 'Rejected' ? 'text-red-500' :
-                    request.status === 'Pending' ? 'text-gray-500' :
-                    'text-yellow-500'
+                    'text-gray-500'
                   }`}>
                     {request.status}
                   </td>
                   <td className="border-b py-2">
-                    {request.status !== 'Rejected' && request.status !== 'Accepted' && (
+                    {request.status === 'Pending' && (
                       <button
                         onClick={() => handleSend(request.reqid)}
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"

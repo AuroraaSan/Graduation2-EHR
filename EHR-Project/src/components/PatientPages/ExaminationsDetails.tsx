@@ -21,7 +21,7 @@ const ExaminationsDetails: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Mock data with a structure matching the original expectations
+        //const response = await axios.get('http://localhost:3001/api/hospitals');
         const mockData = {
           complains: 'Patient has a history of headaches.',
           diagnosis: 'Migraine',

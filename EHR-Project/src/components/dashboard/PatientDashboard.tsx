@@ -29,10 +29,7 @@ const PatientDashboard: React.FC = () => (
             to="/TestsAndXrays"
             className="text-lg lg:text-xl text-gray-700 hover:text-blue-500"> Medical Tests And X-Rays
           </NavLink>
-          <NavLink
-            to="/PatientsAdmitted"
-            className="text-lg lg:text-xl text-gray-700 hover:text-blue-500"> Patients
-          </NavLink>
+        
         </div>
       </div>
     </div>

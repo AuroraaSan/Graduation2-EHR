@@ -20,6 +20,12 @@ const AdminDashboard: React.FC = () => (
             Add Patients
           </NavLink>
           <NavLink
+            to="/PatientRequests"
+            className="text-lg lg:text-xl text-gray-700 hover:text-blue-500"
+          >
+            Patient Requests
+          </NavLink>
+          <NavLink
             to="/Admissions"
             className="text-lg lg:text-xl text-gray-700 hover:text-blue-500"
           >

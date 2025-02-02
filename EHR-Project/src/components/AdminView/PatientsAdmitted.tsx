@@ -18,8 +18,15 @@ const AdmittedPatients: React.FC = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/patients');
-        setPatients(response.data);
+        // Mock data for patients
+        const mockPatients: Patient[] = [
+          { id: 'P001', full_name: 'John Doe', email: 'john.doe@example.com', phone_number: '123-456-7890' },
+          { id: 'P002', full_name: 'Jane Smith', email: 'jane.smith@example.com', phone_number: '234-567-8901' },
+          { id: 'P003', full_name: 'Alice Johnson', email: 'alice.johnson@example.com', phone_number: '345-678-9012' },
+          { id: 'P004', full_name: 'Bob Brown', email: 'bob.brown@example.com', phone_number: '456-789-0123' },
+          { id: 'P005', full_name: 'Charlie Davis', email: 'charlie.davis@example.com', phone_number: '567-890-1234' },
+        ];
+        setPatients(mockPatients);
       } catch (err) {
         setError('Failed to load patients');
       } finally {

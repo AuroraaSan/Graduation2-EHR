@@ -28,8 +28,6 @@ const TestsAndXrays: React.FC = () => {
             status: 'In Progress',
           },
         ];
-
-        // Simulate a delay
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         setResults(mockData);
@@ -59,9 +57,6 @@ const TestsAndXrays: React.FC = () => {
         ) : (
           <div className="bg-white shadow-md rounded-lg p-6">
             <div className="flex justify-end mb-4">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Sort
-              </button>
             </div>
             <table className="w-full text-left">
               <thead>

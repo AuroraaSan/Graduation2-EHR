@@ -59,7 +59,7 @@ const AddPatientData: React.FC = () => {
   };
 
   const handleBackClick = () => {
-    navigate('/DoctorDashboard');
+    navigate('/AdminDashboard');
   };
 
 return (

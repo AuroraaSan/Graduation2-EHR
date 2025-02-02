@@ -3,22 +3,35 @@ import axios from 'axios';
 import AdminNavbar from '../Navbar/AdminNavbar';
 
 interface Doctor {
-  patien_id: string;
-  doctor_id:string;
+  id: string;
+  full_name: string;
+  specialization: string;
+  email: string;
 }
 
-const AddPatientToDoctor: React.FC = () => {
+const AddAdmission: React.FC = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [patientId, setPatientId] = useState('');
+  const [patient_id, setpatient_id] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [doctorsPerPage] = useState(5); // Number of doctors per page
+
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/doctors');
-        setDoctors(response.data);
+        const response = await axios.get('http://localhost:3000/api/user/admin/doctors', { withCredentials: true });
+        console.log('API Response:', response.data); // Log the response
+
+        // Ensure response.data.doctors exists before setting it
+        if (response.data && response.data.doctors) {
+          setDoctors(response.data.doctors);
+        } else {
+          setError('No doctors found in the response');
+        }
       } catch (err) {
         setError('Failed to load doctors');
       } finally {
@@ -29,14 +42,46 @@ const AddPatientToDoctor: React.FC = () => {
     fetchDoctors();
   }, []);
 
-  const filteredDoctors = doctors.filter(doctor =>
-    doctor.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDoctors = doctors ? doctors.filter(doctor =>
+    doctor.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  ) : [];
 
-  const handleAddPatient = (doctorId: string) => {
-    if (patientId) {
-      console.log(`Adding patient ${patientId} to doctor ${doctorId}`);
-      // Implement the logic to add the patient to the doctor
+  // Pagination logic
+  const indexOfLastDoctor = currentPage * doctorsPerPage;
+  const indexOfFirstDoctor = indexOfLastDoctor - doctorsPerPage;
+  const currentDoctors = filteredDoctors.slice(indexOfFirstDoctor, indexOfLastDoctor);
+
+  const totalPages = Math.ceil(filteredDoctors.length / doctorsPerPage);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handleAddPatient = async (doctor_id: string) => {
+    if (patient_id) {
+      try {
+        console.log('Adding patient:', { patient_id, doctor_id });
+
+        const response = await axios.post(
+          'http://localhost:3000/api/user/admin/admission',
+          {
+            patient_id,
+            doctor_id,
+          },
+          { withCredentials: true }
+        );
+
+        if (response.status === 201) {
+          alert('Patient added to doctor successfully');
+        } else {
+          alert('Failed to add patient to doctor: ' + response.data.message);
+        }
+      } catch (error) {
+        console.error('Error adding patient to doctor:', error);
+        alert('Failed to add patient to doctor');
+      }
+    } else {
+      alert('Please enter a Patient ID');
     }
   };
 
@@ -51,8 +96,8 @@ const AddPatientToDoctor: React.FC = () => {
         <input
           type="text"
           placeholder="Enter Patient ID"
-          value={patientId}
-          onChange={(e) => setPatientId(e.target.value)}
+          value={patient_id}
+          onChange={(e) => setpatient_id(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2 mb-6 w-full"
         />
         <div className="bg-white shadow-md rounded-lg p-6">
@@ -73,24 +118,22 @@ const AddPatientToDoctor: React.FC = () => {
               <tr>
                 <th className="border-b py-2">Doctor ID</th>
                 <th className="border-b py-2">Examination Type</th>
-                <th className="border-b py-2">Date</th>
                 <th className="border-b py-2">Doctor Name</th>
                 <th className="border-b py-2">Add Patient to Doctor</th>
               </tr>
             </thead>
             <tbody>
-              {filteredDoctors.map((doctor) => (
+              {currentDoctors.map((doctor) => (
                 <tr key={doctor.id}>
                   <td className="border-b py-2">{doctor.id}</td>
-                  <td className="border-b py-2">{doctor.examinationType}</td>
-                  <td className="border-b py-2">{doctor.date}</td>
-                  <td className="border-b py-2">{doctor.name}</td>
+                  <td className="border-b py-2">{doctor.specialization}</td>
+                  <td className="border-b py-2">{doctor.full_name}</td>
                   <td className="border-b py-2">
                     <button
                       onClick={() => handleAddPatient(doctor.id)}
-                      disabled={!patientId}
+                      disabled={!patient_id}
                       className={`px-4 py-2 rounded-lg ${
-                        patientId ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500'
+                        patient_id ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500'
                       }`}
                     >
                       Add
@@ -101,10 +144,24 @@ const AddPatientToDoctor: React.FC = () => {
             </tbody>
           </table>
           <div className="flex justify-between items-center mt-4">
-            <span>Page 1 of 10</span>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
             <div className="flex space-x-2">
-              <button className="text-gray-700 hover:text-blue-600">Previous</button>
-              <button className="text-gray-700 hover:text-blue-600">Next</button>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="text-gray-700 hover:text-blue-600 disabled:text-gray-300"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="text-gray-700 hover:text-blue-600 disabled:text-gray-300"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
@@ -113,4 +170,4 @@ const AddPatientToDoctor: React.FC = () => {
   );
 };
 
-export default AddPatientToDoctor;
+export default AddAdmission;
