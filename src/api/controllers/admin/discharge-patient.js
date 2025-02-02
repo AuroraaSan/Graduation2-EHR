@@ -1,3 +1,4 @@
+import { redisClient } from "../../../loaders/redis-loader.js";
 import Admin from "../../../models/admin-model.js";
 import Admission from "../../../models/admission-model.js";
 import * as utils from '../../../utils/utils-index.js';
@@ -26,7 +27,7 @@ export default async (req, res) => {
         admission.discharge_date = new Date();
         await admission.save();
 
-        await redisClient.sRem('admissions', `admission:${patientId}:${doctorId}`);
+        await redisClient.sRem('admissions', `admission:${patientId}:${admission.doctorId}`);
 
         res.status(200).send({
             message: 'Patient discharged successfully'
