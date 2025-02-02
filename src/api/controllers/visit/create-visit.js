@@ -6,7 +6,7 @@ import { validate } from '../../validators/validator.js';
 import { createVisitSchema } from '../../validators/schemas/index.js';
 import { VerifyAdmissionStatus } from '../../../utils/redis-fetch.js';
 
-export const createVisit = async (req, res) => {
+const createVisit = async (req, res) => {
   try {
     validate(createVisitSchema);
     const {

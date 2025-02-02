@@ -1,24 +1,31 @@
-import { BaseError } from './errors.js';
+import { BaseError } from "./errors.js";
 
-const sendSuccess = (res, data = {}, message = 'Success',  statusCode = 200) => {
+export const sendSuccess = (
+  res,
+  data = null,
+  message = "Success",
+  statusCode = 200
+) =>
   res.status(statusCode).json({
-    status: 'success',
+    status: "success",
     message,
-    data,
+    ...(data && { data }),
   });
-};
 
-const sendError = (res, error) => {
+export const sendError = (res, error) => {
   // Check if the error is a custom error, else default to 500
   const statusCode = error instanceof BaseError ? error.statusCode : 500;
-  const message = error.message || 'An unexpected error occurred';
+  const message = error.message || "An unexpected error occurred";
   const details = error.details || null;
 
   res.status(statusCode).json({
-    status: 'error',
+    status: "error",
     message,
     ...(details && { details }), // Only include details if they exist
   });
 };
 
-export { sendSuccess, sendError };
+// Middleware to handle async errors
+export const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};

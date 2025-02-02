@@ -1,6 +1,5 @@
 // export { default as swaggerConfig } from './swagger.config.js';
 import { config } from "dotenv";
-import e from "express";
 
 config();
 
