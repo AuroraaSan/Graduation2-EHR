@@ -1,15 +1,17 @@
 import { Medication, MedicalRecord } from '../../../models/models-index.js';
-import { sendSuccess, sendError } from '../../../utils/response-handler.js';
+import { sendSuccess, asyncHandler, sendError } from '../../../utils/response-handler.js';
 import { createAuditLog } from '../../../utils/audit-logger.js';
-import { NotFoundError, ValidationError } from '../../../utils/errors.js';
+import { ForbiddenError, NotFoundError, ValidationError } from '../../../utils/errors.js';
 import { validate } from '../../validators/validator.js';
 import { createMedicationSchema } from '../../validators/schemas/index.js';
+import { VerifyAdmissionStatus } from '../../../utils/redis-fetch.js';
 
-export const createMedication = async (req, res) => {
-    validate(createMedicationSchema); // Validation middleware will run before the controller
+const createMedication = async (req, res) => {
+  try {
+    validate(createMedicationSchema);
     const {
-      medical_record_id,
       medication_name,
+      patient_id,
       dosage,
       frequency,
       start_date,
@@ -23,20 +25,31 @@ export const createMedication = async (req, res) => {
       prescription_id,
     } = req.body;
 
-    // doctor id should be provided after authentication and authorization
-    const doctor_id = req.body?.doctor_id;
+    const doctor_id = req.auth.payload.sub;
+
     if (!doctor_id) {
-      throw new ValidationError('Doctor ID not provided', { field: 'doctor_id' });
+      throw new ValidationError("Doctor ID not provided", {
+        field: "doctor_id",
+      });
+    }
+
+    if ((await VerifyAdmissionStatus(patient_id, doctor_id)) === false) {
+      throw new ForbiddenError("Doctor is not assigned to this patient");
+    }
+
+    if (await VerifyAdmissionStatus(patient_id, doctor_id) === false) {
+      throw new ForbiddenError('Doctor is not assigned to this patient');
     }
 
     // Verify medical record exists
-    const medicalRecord = await MedicalRecord.findById(medical_record_id);
+    const medicalRecord = await MedicalRecord.findOne({ patient_id });
     if (!medicalRecord) {
-      throw new NotFoundError('Medical Record', medical_record_id);
+      throw new NotFoundError('Medical Record', patient_id);
     }
 
     const medication = new Medication({
-      medical_record_id,
+      medical_record_id: medicalRecord._id,
+      patient_id,
       medication_name,
       dosage,
       frequency,
@@ -50,22 +63,22 @@ export const createMedication = async (req, res) => {
       refills_remaining,
       pharmacy_notes,
       prescription_id,
-      status: 'Active',
+      status: "Active",
     });
 
     const savedMedication = await medication.save();
 
     // Update medical record with the new medication
     await MedicalRecord.findByIdAndUpdate(
-      medical_record_id,
+      medicalRecord._id,
       { $push: { medications: savedMedication._id } }
     );
 
     await createAuditLog({
-      medical_record_id,
+      medical_record_id: medicalRecord._id,
       collection_name: 'medications',
       document_id: savedMedication._id,
-      action: 'CREATE',
+      action: "CREATE",
       changes: {
         after: savedMedication.toObject(),
       },
@@ -75,4 +88,9 @@ export const createMedication = async (req, res) => {
     });
 
     return sendSuccess(res, savedMedication, 'Medication prescribed successfully', 201);
-  };
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
+export default asyncHandler(createMedication);

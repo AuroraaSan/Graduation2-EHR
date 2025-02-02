@@ -8,6 +8,10 @@ const medicationSchema = new Schema({
     ref: 'MedicalRecord',
     required: true,
   },
+  patient_id: {
+    type: String, // External ID from PostgreSQL
+    required: true,
+  },
   medication_name: {
     type: String,
     required: true,

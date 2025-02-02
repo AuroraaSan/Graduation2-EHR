@@ -3,47 +3,45 @@ import express from 'express';
 import {
   createRecord,
   getRecord,
-  // updateRecord,
   deleteRecord,
 } from '../controllers/record/index.js';
 import {
   createVisit,
-  // getAllVisits,
   getVisit,
-  // updateVisit,
-  // deleteVisit,
+  updateVisit,
+  deleteVisit,
   getAllVisits,
 } from '../controllers/visit/index.js';
 import {
   createSurgery,
-  // getSurgery,
-  // updateSurgery,
-  // deleteSurgery,
-  // getAllSurgeries,
+  getSurgery,
+  updateSurgery,
+  deleteSurgery,
+  getAllSurgeries,
 } from '../controllers/surgery/index.js';
 import {
   createMedication,
-  // getMedication,
-  // updateMedication,
-  // deleteMedication,
-  // getAllMedications
+  getMedication,
+  updateMedication,
+  deleteMedication,
+  getAllMedications,
 } from '../controllers/medication/index.js';
 import {
   createAllergy,
-  // getAllergy,
-  // getAllAllergies,
-  // updateAllergy,
-  // deleteAllergy
+  getAllergy,
+  getAllAllergies,
+  updateAllergy,
+  deleteAllergy,
 } from '../controllers/allergy/index.js';
 import {
   createCondition,
-  // getCondition,
-  // getAllConditions,
-  // updateCondition,
-  // deleteCondition
+  getCondition,
+  getAllConditions,
+  updateCondition,
+  deleteCondition,
 } from '../controllers/condition/index.js';
 import { authAccessToken, authenticate } from '../middleware/auth-middleware.js';
-// import { authorizeUser } from '../middleware/access-middleware.js';
+import { authorizeUser } from '../middleware/access-middleware.js';
 
 const router = express.Router();
 
@@ -51,17 +49,16 @@ const router = express.Router();
 router.post(
   '/medical-records',
   authenticate,
-  // authorizeUser('createRecord'),
+  authorizeUser('createRecord'),
   createRecord
 );
 
 router.get(
   '/medical-records/:id',
-  // authorize(RecordAuthorization.getRecord),
+  authenticate,
+  authorizeUser('getRecord'),
   getRecord
 );
-
-// router.put('/medical-records/:id', updateRecord);
 
 router.delete(
   '/medical-records/:id',
@@ -72,77 +69,188 @@ router.delete(
 router.post(
   '/visits',
   authenticate,
-  // authorize(RecordAuthorization.createVisit),
+  authorizeUser('createVisit'),
   createVisit
 );
 
 router.get(
   '/visits/:id',
-  // authorize(RecordAuthorization.getVisit),
+  authenticate,
+  authorizeUser('getVisit'),
   getVisit
 );
 
 router.get(
   '/visits',
   authenticate,
-  // authorize(RecordAuthorization.getAllVisits),
+  authorizeUser('getAllVisits'),
   getAllVisits
 );
 
-// router.put('/visits/:id', updateVisit);
-// router.delete('/visits/:id', deleteVisit);
+router.put(
+  '/visits/:id',
+  authenticate,
+  authorizeUser('updateVisit'),
+  updateVisit
+);
+
+router.delete(
+  '/visits/:id',
+  authenticate,
+  authorizeUser('deleteVisit'),
+  deleteVisit
+);
 
 // ---------------------- Surgery routes ---------------------- //
 router.post(
   '/surgeries',
-  // authorize(RecordAuthorization.createSurgery),
+  authenticate,
+  authorizeUser('createSurgery'),
   createSurgery
 );
 
-// router.get('/surgeries', getAllSurgeries);
-// router.get('/surgeries/:id', getSurgery);
-// router.put('/surgeries/:id', updateSurgery);
-// router.delete('/surgeries/:id', deleteSurgery);
+router.get(
+  '/surgeries',
+  authenticate,
+  authorizeUser('getAllSurgeries'),
+  getAllSurgeries
+);
+
+router.get(
+  '/surgeries/:id',
+  authenticate,
+  authorizeUser('getSurgery'),
+  getSurgery
+);
+
+router.put(
+  '/surgeries/:id',
+  authenticate,
+  authorizeUser('updateSurgery'),
+  updateSurgery
+);
+
+router.delete(
+  '/surgeries/:id',
+  authenticate,
+  authorizeUser('deleteSurgery'),
+  deleteSurgery
+);
 
 // ---------------------- Medication routes ---------------------- //
 router.post(
   '/medications',
+  authenticate,
+  authorizeUser('createMedication'),
   createMedication
 );
 
-// router.get('/medications', getAllMedications);
-// router.get('/medications/:id', getMedication);
-// router.put('/medications/:id', updateMedication);
-// router.delete('/medications/:id', deleteMedication);
+router.get(
+  '/medications',
+  authenticate,
+  authorizeUser('getAllMedications'),
+  getAllMedications
+);
+
+router.get(
+  '/medications/:id',
+  authenticate,
+  authorizeUser('getMedication'),
+  getMedication
+);
+
+router.put(
+  '/medications/:id',
+  authenticate,
+  authorizeUser('updateMedication'),
+  updateMedication
+);
+
+router.delete(
+  '/medications/:id',
+  authenticate,
+  authorizeUser('deleteMedication'),
+  deleteMedication
+);
 
 // ---------------------- Allergy routes ---------------------- //
 router.post(
   '/allergies',
+  authenticate,
+  authorizeUser('createAllergy'),
   createAllergy
 );
 
-// router.get('/allergies', getAllAllergies);
-// router.get('/allergies/:id', getAllergy);
-// router.put('/allergies/:id', updateAllergy);
-// router.delete('/allergies/:id', deleteAllergy);
+router.get(
+  '/allergies',
+  authenticate,
+  authorizeUser('getAllAllergies'),
+  getAllAllergies
+);
+
+router.get(
+  '/allergies/:id',
+  authenticate,
+  authorizeUser('getAllergy'),
+  getAllergy
+);
+
+router.put(
+  '/allergies/:id',
+  authenticate,
+  authorizeUser('updateAllergy'),
+  updateAllergy
+);
+
+router.delete(
+  '/allergies/:id',
+  authenticate,
+  authorizeUser('deleteAllergy'),
+  deleteAllergy
+);
 
 // ---------------------- Medical Conditions routes ---------------------- //
 router.post(
   '/conditions',
+  authenticate,
+  authorizeUser('createCondition'),
   createCondition
+);
+
+router.get(
+  '/conditions',
+  authenticate,
+  authorizeUser('getAllConditions'),
+  getAllConditions
+);
+
+router.get(
+  '/conditions/:id',
+  authenticate,
+  authorizeUser('getCondition'),
+  getCondition
+);
+
+router.put(
+  '/conditions/:id',
+  authenticate,
+  authorizeUser('updateCondition'),
+  updateCondition
+);
+
+router.delete(
+  '/conditions/:id',
+  authenticate,
+  authorizeUser('deleteCondition'),
+  deleteCondition
 );
 
 router.get(
   '/check-authentication',
   authAccessToken,
   (req, res) => {
-    res.send({"authenticated": true});
+    res.send({ authenticated: true });
   }
-)
-
-// router.get('/conditions', getAllConditions);
-// router.get('/conditions/:id', getCondition);
-// router.put('/conditions/:id', updateCondition);
-// router.delete('/conditions/:id', deleteCondition);
+);
 
 export default router;
