@@ -16,6 +16,8 @@ RUN npm install --omit=dev
 # copy the rest of the project files
 COPY . /patient_service/
 
+ENV MONOGO_URI=''
+
 # App uses port 3000
 EXPOSE 3001
 
