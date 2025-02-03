@@ -17,11 +17,14 @@ const sanitizeFileName = (fileName) => {
   return fileName.replace(/[<>:"/\\|?*]+/g, "-");
 };
 
-const aiPostExamReport = async (patient_id) => {
+const aiPostExamReport = async (patient_id, visit_id) => {
   const response = await fetch(
     `http://${ai_service}/generate_report/${patient_id}`,
     {
       method: "POST",
+      body: {
+        visit_id,
+      },
       headers: {
         "Content-Type": "application/json",
       },
@@ -46,12 +49,24 @@ const aiPostExamReport = async (patient_id) => {
 export const genPostExamReport = async (req, res) => {
   try {
     const { patient_id } = req.params;
+    const { visit_id } = req.body;
+
+    // Get the visit from the database
+    const visit = await Visit.findById(visit_id);
+
+    if (!visit) {
+      throw new NotFoundError(`Visit not found with ID: ${visit_id}`, {
+        visit_id,
+      });
+    }
 
     // Get the current file path
     const __filename = fileURLToPath(import.meta.url);
     // Get the directory name
     const __dirname = path.dirname(__filename);
-    const pdfFileName = sanitizeFileName(generatePdfFileName(patient_id));
+    const pdfFileName = sanitizeFileName(
+      generatePdfFileName(patient_id, visit_id)
+    );
     console.log("__dirname:", __dirname);
 
     const tempDir = path.join(__dirname, "../temp");
@@ -68,7 +83,7 @@ export const genPostExamReport = async (req, res) => {
     console.log("pdfFileName:", pdfFileName);
 
     // Send request to AI service and get the HTML report
-    const htmlResponse = await aiPostExamReport(patient_id);
+    const htmlResponse = await aiPostExamReport(patient_id, visit_id);
     console.log("htmlResponse:", htmlResponse);
 
     if (!htmlResponse || htmlResponse === "Not Found") {
@@ -84,12 +99,12 @@ export const genPostExamReport = async (req, res) => {
       pdfFilePath,
       pdfFileName
     );
-
-    // visit.report_url = pdfFileName;
-    // await visit.save();
+    console.log(`PDF_FILE_NAME: ${pdfFileName}`);
+    visit.report_ref = pdfFileName;
+    await visit.save();
 
     // Optionally, delete the file after uploading
-    // fs.unlinkSync(pdfFilePath);
+    fs.unlinkSync(pdfFilePath);
 
     await createAuditLog(req, {
       action: "CREATE",

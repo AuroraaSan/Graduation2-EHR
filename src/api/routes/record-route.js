@@ -1,256 +1,250 @@
 // Only implemented create routes for now
-import express from 'express';
+import express from "express";
 import {
   createRecord,
   getRecord,
   deleteRecord,
-} from '../controllers/record/index.js';
+} from "../controllers/record/index.js";
 import {
   createVisit,
   getVisit,
   updateVisit,
   deleteVisit,
   getAllVisits,
-} from '../controllers/visit/index.js';
+  getReport,
+} from "../controllers/visit/index.js";
 import {
   createSurgery,
   getSurgery,
   updateSurgery,
   deleteSurgery,
   getAllSurgeries,
-} from '../controllers/surgery/index.js';
+} from "../controllers/surgery/index.js";
 import {
   createMedication,
   getMedication,
   updateMedication,
   deleteMedication,
   getAllMedications,
-} from '../controllers/medication/index.js';
+} from "../controllers/medication/index.js";
 import {
   createAllergy,
   getAllergy,
   getAllAllergies,
   updateAllergy,
   deleteAllergy,
-} from '../controllers/allergy/index.js';
+} from "../controllers/allergy/index.js";
 import {
   createCondition,
   getCondition,
   getAllConditions,
   updateCondition,
   deleteCondition,
-} from '../controllers/condition/index.js';
-import { authAccessToken, authenticate } from '../middleware/auth-middleware.js';
-import { authorizeUser } from '../middleware/access-middleware.js';
+} from "../controllers/condition/index.js";
+import {
+  authAccessToken,
+  authenticate,
+} from "../middleware/auth-middleware.js";
+import { authorizeUser } from "../middleware/access-middleware.js";
 
 const router = express.Router();
 
 // ---------------------- Medical Records ---------------------- //
 router.post(
-  '/medical-records',
+  "/medical-records",
   authenticate,
-  authorizeUser('createRecord'),
+  authorizeUser("createRecord"),
   createRecord
 );
 
 router.get(
-  '/medical-records/:id',
+  "/medical-records/:id",
   authenticate,
-  authorizeUser('getRecord'),
+  authorizeUser("getRecord"),
   getRecord
 );
 
-router.delete(
-  '/medical-records/:id',
-  deleteRecord
-);
+router.delete("/medical-records/:id", deleteRecord);
 
 // ---------------------- Visit routes ---------------------- //
-router.post(
-  '/visits',
-  authenticate,
-  authorizeUser('createVisit'),
-  createVisit
-);
+router.post("/visits", authenticate, authorizeUser("createVisit"), createVisit);
+
+router.get("/visits/:id", authenticate, authorizeUser("getVisit"), getVisit);
 
 router.get(
-  '/visits/:id',
+  "/visits",
   authenticate,
-  authorizeUser('getVisit'),
-  getVisit
-);
-
-router.get(
-  '/visits',
-  authenticate,
-  authorizeUser('getAllVisits'),
+  authorizeUser("getAllVisits"),
   getAllVisits
 );
 
 router.put(
-  '/visits/:id',
+  "/visits/:id",
   authenticate,
-  authorizeUser('updateVisit'),
+  authorizeUser("updateVisit"),
   updateVisit
 );
 
 router.delete(
-  '/visits/:id',
+  "/visits/:id",
   authenticate,
-  authorizeUser('deleteVisit'),
+  authorizeUser("deleteVisit"),
   deleteVisit
+);
+
+router.get(
+  "/visits/:id/report",
+  // authenticate,
+  // authorizeUser('getReport'),
+  getReport
 );
 
 // ---------------------- Surgery routes ---------------------- //
 router.post(
-  '/surgeries',
+  "/surgeries",
   authenticate,
-  authorizeUser('createSurgery'),
+  authorizeUser("createSurgery"),
   createSurgery
 );
 
 router.get(
-  '/surgeries',
+  "/surgeries",
   authenticate,
-  authorizeUser('getAllSurgeries'),
+  authorizeUser("getAllSurgeries"),
   getAllSurgeries
 );
 
 router.get(
-  '/surgeries/:id',
+  "/surgeries/:id",
   authenticate,
-  authorizeUser('getSurgery'),
+  authorizeUser("getSurgery"),
   getSurgery
 );
 
 router.put(
-  '/surgeries/:id',
+  "/surgeries/:id",
   authenticate,
-  authorizeUser('updateSurgery'),
+  authorizeUser("updateSurgery"),
   updateSurgery
 );
 
 router.delete(
-  '/surgeries/:id',
+  "/surgeries/:id",
   authenticate,
-  authorizeUser('deleteSurgery'),
+  authorizeUser("deleteSurgery"),
   deleteSurgery
 );
 
 // ---------------------- Medication routes ---------------------- //
 router.post(
-  '/medications',
+  "/medications",
   authenticate,
-  authorizeUser('createMedication'),
+  authorizeUser("createMedication"),
   createMedication
 );
 
 router.get(
-  '/medications',
+  "/medications",
   authenticate,
-  authorizeUser('getAllMedications'),
+  authorizeUser("getAllMedications"),
   getAllMedications
 );
 
 router.get(
-  '/medications/:id',
+  "/medications/:id",
   authenticate,
-  authorizeUser('getMedication'),
+  authorizeUser("getMedication"),
   getMedication
 );
 
 router.put(
-  '/medications/:id',
+  "/medications/:id",
   authenticate,
-  authorizeUser('updateMedication'),
+  authorizeUser("updateMedication"),
   updateMedication
 );
 
 router.delete(
-  '/medications/:id',
+  "/medications/:id",
   authenticate,
-  authorizeUser('deleteMedication'),
+  authorizeUser("deleteMedication"),
   deleteMedication
 );
 
 // ---------------------- Allergy routes ---------------------- //
 router.post(
-  '/allergies',
+  "/allergies",
   authenticate,
-  authorizeUser('createAllergy'),
+  authorizeUser("createAllergy"),
   createAllergy
 );
 
 router.get(
-  '/allergies',
+  "/allergies",
   authenticate,
-  authorizeUser('getAllAllergies'),
+  authorizeUser("getAllAllergies"),
   getAllAllergies
 );
 
 router.get(
-  '/allergies/:id',
+  "/allergies/:id",
   authenticate,
-  authorizeUser('getAllergy'),
+  authorizeUser("getAllergy"),
   getAllergy
 );
 
 router.put(
-  '/allergies/:id',
+  "/allergies/:id",
   authenticate,
-  authorizeUser('updateAllergy'),
+  authorizeUser("updateAllergy"),
   updateAllergy
 );
 
 router.delete(
-  '/allergies/:id',
+  "/allergies/:id",
   authenticate,
-  authorizeUser('deleteAllergy'),
+  authorizeUser("deleteAllergy"),
   deleteAllergy
 );
 
 // ---------------------- Medical Conditions routes ---------------------- //
 router.post(
-  '/conditions',
+  "/conditions",
   authenticate,
-  authorizeUser('createCondition'),
+  authorizeUser("createCondition"),
   createCondition
 );
 
 router.get(
-  '/conditions',
+  "/conditions",
   authenticate,
-  authorizeUser('getAllConditions'),
+  authorizeUser("getAllConditions"),
   getAllConditions
 );
 
 router.get(
-  '/conditions/:id',
+  "/conditions/:id",
   authenticate,
-  authorizeUser('getCondition'),
+  authorizeUser("getCondition"),
   getCondition
 );
 
 router.put(
-  '/conditions/:id',
+  "/conditions/:id",
   authenticate,
-  authorizeUser('updateCondition'),
+  authorizeUser("updateCondition"),
   updateCondition
 );
 
 router.delete(
-  '/conditions/:id',
+  "/conditions/:id",
   authenticate,
-  authorizeUser('deleteCondition'),
+  authorizeUser("deleteCondition"),
   deleteCondition
 );
 
-router.get(
-  '/check-authentication',
-  authAccessToken,
-  (req, res) => {
-    res.send({ authenticated: true });
-  }
-);
+router.get("/check-authentication", authAccessToken, (req, res) => {
+  res.send({ authenticated: true });
+});
 
 export default router;
