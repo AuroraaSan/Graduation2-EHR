@@ -23,11 +23,11 @@ const ExaminationsDetails: React.FC = () => {
       try {
         //const response = await axios.get('http://localhost:3001/api/hospitals');
         const mockData = {
-          complains: 'Patient has a history of headaches.',
+          complains: 'Severe recurring headache, lasting from 4 to 7 hours.',
           diagnosis: 'Migraine',
-          symptoms: 'Headache, nausea, light sensitivity',
-          treatment: 'Prescribed pain relievers and rest',
-          notes: 'Patient advised to avoid stress',
+          symptoms: 'Fatigue, mood changes, sensitive to light',
+          treatment: 'Anti Emetics',
+          notes: 'Patient should have rest for at least 6 hours a day',
         };
         setData(mockData);
       } catch (err) {
@@ -45,7 +45,7 @@ const ExaminationsDetails: React.FC = () => {
     <div>
       <PatientNavbar />
       <div className="p-8">
-        <h2 className="text-3xl text-blue-600 mb-6">Examination ID: {id} - Examination Type: {type}</h2>
+    <h2 className="text-3xl text-blue-600 mb-6"> A prescription of a Cardiology Examination </h2>
         <div className="bg-white shadow-md rounded-lg p-6">
           <div className="flex space-x-4 border-b mb-4">
             {['Complains', 'Diagnosis', 'Symptoms', 'Treatment and Medication', 'Notes'].map((tab) => (

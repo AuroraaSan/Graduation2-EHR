@@ -6,19 +6,19 @@ interface Doctor {
   id: string;
   full_name: string;
   specialization: string;
-  email: string;
+  national_id: number;
 }
 
 const AddAdmission: React.FC = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [patient_id, setpatient_id] = useState('');
+  const [national_id, setnational_id] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [doctorsPerPage] = useState(5); // Number of doctors per page
+  const [doctorsPerPage] = useState(5); 
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -42,6 +42,11 @@ const AddAdmission: React.FC = () => {
     fetchDoctors();
   }, []);
 
+  // Function to format the doctor ID
+  const formatDoctorId = (id: string) => {
+    return id.replace('auth0|', ''); // Remove the 'auth0|' prefix
+  };
+
   const filteredDoctors = doctors ? doctors.filter(doctor =>
     doctor.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   ) : [];
@@ -58,14 +63,14 @@ const AddAdmission: React.FC = () => {
   };
 
   const handleAddPatient = async (doctor_id: string) => {
-    if (patient_id) {
+    if (national_id) {
       try {
-        console.log('Adding patient:', { patient_id, doctor_id });
+        console.log('Adding patient:', { national_id, doctor_id });
 
         const response = await axios.post(
-          'http://localhost:3000/api/user/admin/admission',
+          'http://localhost:3000/api/user/admin/admission-national-id',
           {
-            patient_id,
+            national_id,
             doctor_id,
           },
           { withCredentials: true }
@@ -85,19 +90,18 @@ const AddAdmission: React.FC = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   return (
     <div>
       <AdminNavbar />
       <div className="p-8">
-        <h2 className="text-3xl text-blue-600 mb-6">Patient ID:</h2>
+        <h2 className="text-3xl text-blue-600 mb-6">Patient National ID:</h2>
         <input
           type="text"
           placeholder="Enter Patient ID"
-          value={patient_id}
-          onChange={(e) => setpatient_id(e.target.value)}
+          value={national_id}
+          onChange={(e) => setnational_id(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2 mb-6 w-full"
         />
         <div className="bg-white shadow-md rounded-lg p-6">
@@ -125,15 +129,15 @@ const AddAdmission: React.FC = () => {
             <tbody>
               {currentDoctors.map((doctor) => (
                 <tr key={doctor.id}>
-                  <td className="border-b py-2">{doctor.id}</td>
+                  <td className="border-b py-2">{formatDoctorId(doctor.id)}</td> {/* Formatted Doctor ID */}
                   <td className="border-b py-2">{doctor.specialization}</td>
                   <td className="border-b py-2">{doctor.full_name}</td>
                   <td className="border-b py-2">
                     <button
                       onClick={() => handleAddPatient(doctor.id)}
-                      disabled={!patient_id}
+                      disabled={!national_id}
                       className={`px-4 py-2 rounded-lg ${
-                        patient_id ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500'
+                        national_id ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500'
                       }`}
                     >
                       Add

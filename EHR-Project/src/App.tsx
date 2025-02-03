@@ -69,7 +69,7 @@ function App() {
 
       {/*Patient*/}
       <Route path="/PatientDashboard" element={<PatientDashboard />} />
-      <Route path="/PastExaminations" element={<PrivateRoute element={<PastExaminations />} allowedRoles={['doctor', 'patient']} />} />
+      <Route path="/PastExaminations" element={<PrivateRoute element={<PastExaminations />} allowedRoles={['patient']} />} />
       <Route path="/TestsAndXrays" element={<PrivateRoute element={<TestsAndXrays />} allowedRoles={['doctor', 'patient']} />} />
       <Route path="/RequestAddition" element={<PrivateRoute element={<RequestAddition />} allowedRoles={['patient']} />} />
       <Route path="/ExaminationsDetails" element={<PrivateRoute element={<ExaminationsDetails />} allowedRoles={['patient']} />} />

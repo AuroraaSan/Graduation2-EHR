@@ -5,9 +5,9 @@ import PatientNavbar from '../Navbar/PatientNavbar';
 
 interface Examination {
   id: number;
-  type: string;
   date: string;
-  doctor: string;
+  doctor_name: string; 
+  specialization: string;
 }
 
 const PastExaminations: React.FC = () => {
@@ -24,21 +24,27 @@ const PastExaminations: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const mockData: Examination[] = [
-          { id: 1, type: 'General Checkup', date: '2023-10-01', doctor: 'Dr. Smith' },
-        { id: 2, type: 'Blood Test', date: '2023-09-15', doctor: 'Dr. Johnson' },
-        { id: 3, type: 'X-Ray', date: '2023-08-20', doctor: 'Dr. Williams' },
-        { id: 4, type: 'MRI Scan', date: '2023-07-10', doctor: 'Dr. Brown' },
-        { id: 5, type: 'Ultrasound', date: '2023-06-05', doctor: 'Dr. Davis' },
-        ];
-        /*const response = await axios.get("http://localhost:3001/api/patient/visits", {
+        // Attempt to fetch data from the API
+        const response = await axios.get('http://localhost:3001/api/records/patient/visits', {
           withCredentials: true,
-        });*/
+        });
+
+        // If the response is successful, set the examinations
+        if (response.data && Array.isArray(response.data)) {
+          setExaminations(response.data);
+          setFilteredExaminations(response.data);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        // If the API request fails, fallback to mock data
+        console.error('Error fetching data:', error);
+        const mockData: Examination[] = [
+          { id: 1, specialization: 'Cardiology', date: '03/02/2025', doctor_name: 'Youssef Elharty' }
+        ];
+
         setExaminations(mockData);
         setFilteredExaminations(mockData);
-      } catch (error) {
-        setError('Failed to fetch examinations.');
-        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -49,8 +55,8 @@ const PastExaminations: React.FC = () => {
 
   useEffect(() => {
     const filtered = examinations.filter((exam) =>
-      exam.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      exam.doctor.toLowerCase().includes(searchQuery.toLowerCase())
+      exam.specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exam.doctor_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredExaminations(filtered);
     setCurrentPage(1);
@@ -81,7 +87,7 @@ const PastExaminations: React.FC = () => {
       headers.join(",") +
       "\n" +
       filteredExaminations
-        .map((exam) => `${exam.id},${exam.type},${exam.date},${exam.doctor}`)
+        .map((exam) => `${exam.id},${exam.specialization},${exam.date},${exam.doctor_name}`)
         .join("\n");
 
     const encodedUri = encodeURI(csvContent);
@@ -138,23 +144,23 @@ const PastExaminations: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {currentExaminations.map((exam) => (
-                <tr key={exam.id}>
-                  <td className="border-b py-2">{exam.id}</td>
-                  <td className="border-b py-2">{exam.type}</td>
-                  <td className="border-b py-2">{new Date(exam.date).toLocaleDateString()}</td>
-                  <td className="border-b py-2">{exam.doctor}</td>
-                  <td className="border-b py-2">
-                    <NavLink
-                      to="/ExaminationsDetails"
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg border border-black hover:bg-green-700"
-                    >
-                      Explore
-                    </NavLink>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            {currentExaminations.map((exam) => (
+              <tr key={exam.id}>
+                <td className="border-b py-2">{exam.id}</td>
+                <td className="border-b py-2">{exam.specialization}</td>
+                <td className="border-b py-2">{new Date(exam.date).toLocaleDateString()}</td>
+                <td className="border-b py-2">{exam.doctor_name}</td>
+                <td className="border-b py-2">
+                  <NavLink
+                    to="/ExaminationsDetails"
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg border border-black hover:bg-green-700"
+                  >
+                    Explore
+                  </NavLink>
+                </td>
+              </tr>
+            ))}
+          </tbody>
           </table>
           <div className="flex justify-between items-center mt-4">
             <span>Page {currentPage} of {totalPages}</span>

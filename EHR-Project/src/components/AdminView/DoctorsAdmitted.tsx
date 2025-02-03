@@ -3,7 +3,7 @@ import axios from 'axios';
 import AdminNavbar from '../Navbar/AdminNavbar';
 
 interface Doctor {
-  id: number;
+  id: string;
   full_name: string;
   specialization: string;
   email:string;
@@ -18,21 +18,25 @@ const AdmittedDoctors: React.FC = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/user/admin/doctors', {withCredentials: true});
-        setDoctors(response.data);
+
+        const response = await axios.get('http://localhost:3000/api/user/admin/doctors', 
+         {withCredentials: true});
+        setDoctors(response.data.doctors);
+        console.log(response.data.doctors);
       } catch (err) {
         setError('Failed to load Doctors');
       } finally {
         setLoading(false);
       }
     };
-
     fetchDoctors();
   }, []);
-
-  /*const filteredDoctors = Doctors.filter(Doctor =>
-    Doctor.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );*/
+  const formatDoctorId = (id: string) => {
+    return id.replace('auth0|', ''); // Remove the 'auth0|' prefix
+  };
+  const filteredDoctors = Doctors.filter(doctor =>
+    doctor.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -62,6 +66,16 @@ const AdmittedDoctors: React.FC = () => {
                 <th className="border-b py-2">Doctor Name</th>
               </tr>
             </thead>
+            <tbody>
+              {filteredDoctors.map((Doctor) => (
+                <tr key={Doctor.id}>
+                  <td className="border-b py-2">{formatDoctorId(Doctor.id)}</td>
+                  <td className="border-b py-2">{Doctor.full_name}</td>
+                  <td className="border-b py-2">{Doctor.specialization}</td>
+                  <td className="border-b py-2">{Doctor.email}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       </div>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Import axios
+import axios from 'axios'; 
 import AdminNavbar from '../Navbar/AdminNavbar';
 import { NavLink } from 'react-router-dom';
 
 interface Admission {
   id: string;
   patient_id: string;
+  patient_name: string; 
   doctor_id: string;
   createdAt: string;
   updatedAt: string;
@@ -21,19 +22,6 @@ const Admissions: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  /*const mockAdmissions: Admission[] = [
-    { id: 1, patient_id: 'John Doe', doctor_id: "", createdAt: "2023-10-01", updatedAt:'',discharge_date: '', doctor_name: 'Dr. Smith' },
-    { id: 2, patient_id: 'Jane Doe', doctor_id: "", createdAt: '2023-10-02',updatedAt:'', discharge_date: '2023-10-05', doctor_name: 'Dr. Johnson' },
-    { id: 3, patient_id: 'Alice Smith', doctor_id: "", createdAt: '2023-10-03', updatedAt:'',discharge_date: '', doctor_name: 'Dr. Brown' },
-    { id: 4, patient_id: 'Bob Johnson', doctor_id: "", createdAt: '2023-10-04', updatedAt:'',discharge_date: '', doctor_name: 'Dr. White' },
-    { id: 5, patient_id: 'Charlie Brown', doctor_id: "", createdAt: '2023-10-05', updatedAt:'',discharge_date: '2023-10-07', doctor_name: 'Dr. Green' },
-    { id: 6, patient_id: 'David Wilson', doctor_id: "", createdAt: '2023-10-06',updatedAt:'', discharge_date: '', doctor_name: 'Dr. Black' },
-    { id: 7, patient_id: 'Eva Green', doctor_id: "", createdAt: '2023-10-07',updatedAt:'', discharge_date: '', doctor_name: 'Dr. Blue' },
-    { id: 8, patient_id: 'Frank White', doctor_id: "", createdAt: '2023-10-08',updatedAt:'', discharge_date: '2023-10-10', doctor_name: 'Dr. Red' },
-    { id: 9, patient_id: 'Grace Black', doctor_id: "", createdAt: '2023-10-09',updatedAt:'', discharge_date: '', doctor_name: 'Dr. Yellow' },
-    { id: 10, patient_id: 'Hank Blue', doctor_id: "", createdAt: '2023-10-10',updatedAt:'', discharge_date: '', doctor_name: 'Dr. Purple' },
-  ];*/
-
   useEffect(() => {
     const fetchAdmissions = async () => {
       try {
@@ -42,7 +30,6 @@ const Admissions: React.FC = () => {
         setAdmissions(response.data); // Assuming the response data is in the correct format
       } catch (err) {
         setError('Failed to load Admissions');
-        //setAdmissions(mockAdmissions); // Fallback to mock data if API call fails
       } finally {
         setLoading(false);
       }
@@ -59,11 +46,10 @@ const Admissions: React.FC = () => {
       setAdmissions(updatedAdmissions);
       const updatedAdmission = updatedAdmissions.find(admission => admission.id === id);
 
-      
       if (!updatedAdmission) {
         throw new Error("Admission not found");
       }
-      //console.log(updatedAdmission.patient_id);
+
       const response = await axios.put(
         `http://localhost:3000/api/user/admin/patient/${updatedAdmission.patient_id}/discharge`,
         { discharge_date: updatedAdmission.discharge_date },
@@ -74,18 +60,19 @@ const Admissions: React.FC = () => {
           withCredentials: true,
         }
       );
-  
+
       if (!response.data.success) {
         throw new Error('Failed to update discharge date on the server');
       }
-  
+
       console.log('Discharge date updated successfully');
     } catch (error) {
       console.error('Error updating discharge date:', error);
     }
   };
+
   const filteredAdmissions = admissions.filter(admission =>
-    admission.patient_id.toLowerCase().includes(searchTerm.toLowerCase())
+    admission.patient_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -93,6 +80,12 @@ const Admissions: React.FC = () => {
   const currentAdmissions = filteredAdmissions.slice(indexOfFirstItem, indexOfLastItem);
 
   const totalPages = Math.ceil(filteredAdmissions.length / itemsPerPage);
+
+  // Function to format the date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(); // Format to a readable date
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -131,8 +124,8 @@ const Admissions: React.FC = () => {
           <table className="w-full text-left">
             <thead>
               <tr>
-                <th className="border-b py-2">Admission ID</th>
-                <th className="border-b py-2">Patient Name</th>
+                <th className="border-b py-2">#</th> {/* Changed to show numbering */}
+                <th className="border-b py-2">Patient Name</th> {/* Changed to show patient name */}
                 <th className="border-b py-2">Date</th>
                 <th className="border-b py-2">Discharge Date</th>
                 <th className="border-b py-2">Doctor Name</th>
@@ -140,13 +133,13 @@ const Admissions: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {currentAdmissions.map((admission) => (
+              {currentAdmissions.map((admission, index) => (
                 <tr key={admission.id}>
-                  <td className="border-b py-2">{admission.id}</td>
-                  <td className="border-b py-2">{admission.patient_id}</td>
-                  <td className="border-b py-2">{admission.createdAt}</td>
+                  <td className="border-b py-2">{indexOfFirstItem + index + 1}</td> {/* Numbering */}
+                  <td className="border-b py-2">{admission.patient_name}</td> {/* Show patient name */}
+                  <td className="border-b py-2">{formatDate(admission.createdAt)}</td> {/* Formatted date */}
                   <td className="border-b py-2">
-                    {admission.discharge_date || 'Not Discharged'}
+                    {admission.discharge_date ? formatDate(admission.discharge_date) : 'Not Discharged'}
                   </td>
                   <td className="border-b py-2">{admission.doctor_name}</td>
                   <td className="border-b py-2">

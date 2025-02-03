@@ -76,8 +76,10 @@ const Hospitals: React.FC = () => {
                   <td className="border-b py-2">{hospital.phone_number}</td>  {/* Updated to match backend */}
                   <td className="border-b py-2">{hospital.email}</td>
                   <td className="border-b py-2">
-                    <img src={hospital} alt="hospital" className="w-20 h-20" />
-                  </td>
+                  <a href="your-link-here">
+                    <img src={hospital.photo_url} alt="hospital" className="w-20 h-20" />
+                  </a>
+                </td>
                 </tr>
               ))}
             </tbody>

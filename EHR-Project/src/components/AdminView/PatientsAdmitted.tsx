@@ -18,17 +18,18 @@ const AdmittedPatients: React.FC = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        // Mock data for patients
-        const mockPatients: Patient[] = [
-          { id: 'P001', full_name: 'John Doe', email: 'john.doe@example.com', phone_number: '123-456-7890' },
-          { id: 'P002', full_name: 'Jane Smith', email: 'jane.smith@example.com', phone_number: '234-567-8901' },
-          { id: 'P003', full_name: 'Alice Johnson', email: 'alice.johnson@example.com', phone_number: '345-678-9012' },
-          { id: 'P004', full_name: 'Bob Brown', email: 'bob.brown@example.com', phone_number: '456-789-0123' },
-          { id: 'P005', full_name: 'Charlie Davis', email: 'charlie.davis@example.com', phone_number: '567-890-1234' },
-        ];
-        setPatients(mockPatients);
+        const response = await axios.get('http://localhost:3000/api/user/admin/patients', { withCredentials: true });
+        console.log('API Response:', response.data); // Log the response for debugging
+
+        // Ensure the response has the expected structure
+        if (response.data && Array.isArray(response.data.patients)) {
+          setPatients(response.data.patients); // Set the patients array
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (err) {
         setError('Failed to load patients');
+        console.error('Error fetching patients:', err);
       } finally {
         setLoading(false);
       }
@@ -37,6 +38,9 @@ const AdmittedPatients: React.FC = () => {
     fetchPatients();
   }, []);
 
+  const formatPatientId = (id: string) => {
+    return id.replace('auth0|', ''); // Remove the 'auth0|' prefix
+  };
   const filteredPatients = patients.filter(patient =>
     patient.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -74,7 +78,7 @@ const AdmittedPatients: React.FC = () => {
             <tbody>
               {filteredPatients.map((patient) => (
                 <tr key={patient.id}>
-                  <td className="border-b py-2">{patient.id}</td>
+                  <td className="border-b py-2">{formatPatientId(patient.id)}</td>
                   <td className="border-b py-2">{patient.full_name}</td>
                   <td className="border-b py-2">{patient.email}</td>
                   <td className="border-b py-2">{patient.phone_number}</td>

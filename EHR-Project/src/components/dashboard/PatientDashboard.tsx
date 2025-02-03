@@ -24,10 +24,6 @@ return(
             className="text-lg lg:text-xl text-gray-700 hover:text-blue-500"> Past Examinations
           </NavLink>
           <NavLink
-            to="#"
-            className="text-lg lg:text-xl text-gray-700 hover:text-blue-500"> Schedule A Visit
-          </NavLink>
-          <NavLink
             to="/RequestAddition"
             className="text-lg lg:text-xl text-gray-700 hover:text-blue-500"> Request Data Addition
           </NavLink>
