@@ -15,11 +15,13 @@ import AdminDashboard from "./components/dashboard/AdminDashboard";
 import Admissions from "./components/AdminView/Admissions";
 import AddAdmission from "./components/AdminView/AddAdmission";
 import PatientRequests from "./components/AdminView/PatientRequests";
+
 //Doctor 
 import AddPatientdata from "./components/AddPatient/AddPatient";
 import DoctorDashboard from "./components/dashboard/DoctorDashboard";
 import AiHistory from "./components/History/AiHistory";
 import PatientTable from "./components/DoctorView/PatientTable";
+import Emergency from "./components/DoctorView/Emergency";
 //Patient
 import PatientDashboard from "./components/dashboard/PatientDashboard";
 import PastExaminations from "./components/PatientPages/PastExaminations";
@@ -54,6 +56,7 @@ function App() {
       <Route path="/Admissions" element={<Admissions />} />
       <Route path="/AddAdmission" element={<AddAdmission />} />
       <Route path="/AddPatient" element={<PrivateRoute element={<AddPatientdata />} allowedRoles={['doctor', 'admin']} />} />
+      <Route path="/Emergency" element={<PrivateRoute element={<Emergency />} allowedRoles={['doctor', 'admin']} />} />
 
       {/*Doctor*/}
       <Route path="/DoctorDashboard" element={<DoctorDashboard />} />

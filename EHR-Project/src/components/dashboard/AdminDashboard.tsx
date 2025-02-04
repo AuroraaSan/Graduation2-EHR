@@ -31,6 +31,7 @@ const AdminDashboard: React.FC = () => (
           >
             Admissions & Discharges
           </NavLink>
+         
         </div>
       </div>
     </div>

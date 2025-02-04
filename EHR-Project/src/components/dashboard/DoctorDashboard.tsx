@@ -30,7 +30,14 @@ const DoctorDashboard: React.FC = () => {
             >
               Add New Examination
             </NavLink>
+            <NavLink
+                        to="/Emergency"
+                        className="text-lg lg:text-xl text-gray-700 hover:text-blue-500"
+                      >
+                        Emergencies
+            </NavLink>
           </div>
+          
 
           {/* React Hot Toast notifications */}
           <Toaster position="top-center" />
