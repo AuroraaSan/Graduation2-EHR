@@ -1,10 +1,10 @@
-import { MedicalRecord } from "../../../models/models-index.js";
-import { sendSuccess, asyncHandler } from "../../../utils/response-handler.js";
-import { createAuditLog } from "../../../utils/audit-logger.js";
-import { ForbiddenError, NotFoundError } from "../../../utils/errors.js";
-import { validate } from "../../validators/validator.js";
-import { getRecordSchema } from "../../validators/schemas/index.js";
-import { VerifyAdmissionStatus } from "../../../utils/redis-fetch.js";
+import { MedicalRecord } from '../../../models/models-index.js';
+import { sendSuccess, asyncHandler, sendError } from '../../../utils/response-handler.js';
+import { createAuditLog } from '../../../utils/audit-logger.js';
+import { ForbiddenError, NotFoundError } from '../../../utils/errors.js';
+import { validate } from '../../validators/validator.js';
+import { getRecordSchema } from '../../validators/schemas/index.js';
+import { VerifyAdmissionStatus } from '../../../utils/redis-fetch.js';
 
 const getRecord = async (req, res) => {
   try {
@@ -13,9 +13,12 @@ const getRecord = async (req, res) => {
 
     // Check if medical record already exists
     const record = await MedicalRecord.findOne({ patient_id })
-      .populate("medical_conditions")
+      .populate('medical_conditions')
+      .populate('medications')
+      .populate('allergies')
+      .populate('surgeries')
+      .populate('visits')
       .lean();
-    console.log(record);
 
     if (!record) {
       throw new NotFoundError(
@@ -27,19 +30,18 @@ const getRecord = async (req, res) => {
     const doctor_id = req.auth.payload.sub;
 
     if ((await VerifyAdmissionStatus(patient_id, doctor_id)) === false) {
-      throw new ForbiddenError("Doctor is not assigned to this patient");
+      throw new ForbiddenError('Doctor is not assigned to this patient');
     }
 
     // Save a new audit log to track actions in the system
     await createAuditLog({
       medical_record_id: record._id,
       doctor_id: req.auth.payload.sub,
-      collection_name: "medical_records",
+      collection_name: 'medical_records',
       document_id: record._id,
-      action: "VIEW",
-      reason: "Medical Record Viewed",
+      action: 'VIEW',
+      reason: 'Medical Record Viewed',
       req,
-      doctor_id,
     });
 
     return sendSuccess(res, record);
