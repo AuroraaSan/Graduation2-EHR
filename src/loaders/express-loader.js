@@ -33,12 +33,19 @@ export default (app) => {
   // Essential middleware setup
   app.enable('trust proxy');
   app.use(cors({
-    origin: ['http://localhost:3002', 'http://127.0.0.1:3002'],
+    origin: (origin, callback) => {
+      const allowedOrigins = ['http://localhost:3002', 'http://127.0.0.1:3002'];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, origin);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
-    accessControlAllowOrigin: ['http://localhost:3002', 'http://127.0.0.1:3002'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   }));
+
   app.use(cookieParser());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());

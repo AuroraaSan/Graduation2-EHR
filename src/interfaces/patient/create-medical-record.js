@@ -32,7 +32,7 @@ export async function createMedicalRecord(medicalRecord) {
         // Make the request to create the medical record
         const response = await axios.post(
             // 'http://patient-records-service.default.svc.cluster.local:80/api/patient/medical-records',
-            'http://localhost:3001/api/records/patient/medical-records',
+            'http://patient-service:80/api/records/patient/medical-records',
             medicalRecord,
             {
                 headers: {
