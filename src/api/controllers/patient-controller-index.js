@@ -14,3 +14,4 @@ export { default as editPatient } from './patient/edit-patient.js'
 // // OTHER
 export { getUser } from './get-user.js'
 export { default as deletePatient } from './patient/delete-patient.js'
+export { default as getAllHospitals } from './patient/get-all-hospitals.js'

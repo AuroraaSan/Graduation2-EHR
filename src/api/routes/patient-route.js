@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login, logout, verifyEmail, resendEmail, forgotPassword, resetPassword, refreshToken, changePassword, editPatient, deletePatient } from '../controllers/patient-controller-index.js';
+import { register, login, logout, verifyEmail, resendEmail, forgotPassword, resetPassword, refreshToken, changePassword, editPatient, deletePatient, getAllHospitals } from '../controllers/patient-controller-index.js';
 import { authorizeUser, authAccessToken } from '../middleware/middleware-index.js';
 
 const router = Router();
@@ -37,5 +37,7 @@ router.post('/change-password', authAccessToken, changePassword);
 router.put('/edit', authAccessToken, editPatient);
 
 router.delete('/delete', authAccessToken, authorizeUser("delete:user"), deletePatient);
+
+router.get('/hospitals', authAccessToken, authorizeUser('getAllHospitals'), getAllHospitals);
 
 export default router

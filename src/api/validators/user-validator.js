@@ -175,3 +175,11 @@ export function createAdmission(body) {
   });
   return schema.validate(body);
 }
+
+export function createAdmissionByNationalId(body) {
+  const schema = joi.object({
+    national_id: joi.string().length(14).required(),
+    doctor_id: joi.string().required(),
+  });
+  return schema.validate(body); 
+}
